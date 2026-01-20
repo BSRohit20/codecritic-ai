@@ -13,26 +13,25 @@ export interface CodeReviewResult {
   bugs: Array<{
     line?: number;
     severity: string;
-    issue: string;
-    fix: string;
+    description: string;
+    suggestion: string;
   }>;
   security_issues: Array<{
     line?: number;
-    risk_level: string;
-    vulnerability: string;
+    severity: string;
+    description: string;
     recommendation: string;
   }>;
   performance_tips: Array<{
-    area: string;
-    current_issue: string;
+    line?: number;
+    description: string;
     optimization: string;
-    impact: string;
   }>;
   refactoring_suggestions: Array<{
-    category: string;
+    line_range: string;
+    description: string;
     current_code: string;
-    suggestion: string;
-    benefit: string;
+    improved_code: string;
   }>;
 }
 
