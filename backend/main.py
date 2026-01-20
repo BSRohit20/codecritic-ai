@@ -73,7 +73,7 @@ http_client = httpx.AsyncClient(
 )
 
 model = OpenAIModel(
-    model_name="meta-llama/llama-3.3-70b-instruct:free",  # Llama 3.3 70B - back to original
+    model_name="mistralai/devstral-2512:free",  # Mistral Devstral 2512 - trying another free model
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPENROUTER_API_KEY", ""),
     http_client=http_client
