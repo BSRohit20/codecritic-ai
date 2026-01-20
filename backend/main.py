@@ -73,7 +73,7 @@ http_client = httpx.AsyncClient(
 )
 
 model = OpenAIModel(
-    model_name="meta-llama/llama-3.1-405b-instruct:free",  # Llama 3.1 405B - largest free model
+    model_name="google/gemini-flash-1.5:free",  # Gemini Flash 1.5 - confirmed tool support
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPENROUTER_API_KEY", ""),
     http_client=http_client
