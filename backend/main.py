@@ -60,28 +60,29 @@ class CodeReviewRequest(BaseModel):
 
 # Initialize Pydantic AI Agent
 # Using Llama 3.3 70B - free model with function calling support
-import httpx
-
 model = OpenAIModel(
     model_name="meta-llama/llama-3.3-70b-instruct:free",  # Free Llama 3.3 70B
     base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY", ""),
-    http_client=httpx.AsyncClient(timeout=60.0)  # 60 second timeout
+    api_key=os.getenv("OPENROUTER_API_KEY", "")
 )
 
 agent = Agent(
     model=model,
     result_type=CodeReviewResult,
-    system_prompt="""Expert code reviewer. Analyze code and provide:
-1. Quality score (0-100)
-2. Brief summary (1-2 sentences)
-3. Top 2-3 strengths
-4. Critical bugs only (max 5)
-5. Security issues (max 3)
-6. Performance tips (max 3)
-7. Key refactoring suggestions (max 2)
+    system_prompt="""You are an expert code reviewer with deep knowledge across multiple programming languages.
+    
+Your task is to thoroughly review code and provide:
+1. An overall quality score (0-100) based on: correctness, readability, maintainability, performance, security
+2. A concise summary of the code's purpose and quality
+3. Specific strengths of the code
+4. Bugs and issues with severity levels
+5. Security vulnerabilities with risk assessments
+6. Performance optimization opportunities
+7. Refactoring suggestions for better code quality
 
-Be concise, specific, and actionable. Focus on critical issues."""
+Be constructive, specific, and actionable. Focus on real issues, not nitpicks.
+Provide line numbers when possible. Be encouraging about good practices while highlighting improvements.
+"""
 )
 
 @app.get("/")
@@ -109,16 +110,16 @@ async def review_code(request: CodeReviewRequest):
             )
         
         # Create the review prompt
-        prompt = f"""Review this {request.language} code:
+        prompt = f"""Review the following {request.language} code:
 
 ```{request.language}
 {request.code}
 ```
 
-Focus on critical issues. Keep responses brief."""
+Provide a comprehensive code review with scores, bugs, security issues, performance tips, and refactoring suggestions."""
 
-        # Run the agent with timeout
-        result = await agent.run(prompt, model_settings={"max_tokens": 2000})
+        # Run the agent
+        result = await agent.run(prompt)
         
         return result.data
         
