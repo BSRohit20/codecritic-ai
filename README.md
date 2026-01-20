@@ -31,6 +31,11 @@ An intelligent, full-stack AI-powered code review assistant built with Pydantic 
 - **Intelligent Retries**: Automatic retry logic for reliability
 - **Detailed Error Handling**: Clear feedback when issues occur
 
+### ⚠️ Important: Rate Limits
+- **Free Tier**: 50 requests per day (resets every 24 hours)
+- **Paid Tier**: Add 10 credits (~$10) for 1,000 requests per day
+- **Upgrade**: Visit [OpenRouter Credits](https://openrouter.ai/credits) to add credits
+
 ## 🏗️ Tech Stack
 
 ### Backend
@@ -276,6 +281,15 @@ For hiring assessment submission, create 1-minute Loom video showing:
 ## 🐛 Troubleshooting
 
 ### Backend Issues
+
+**"Rate limit exceeded" errors**
+- **Cause**: Free tier limited to 50 requests per day
+- **Solutions**:
+  1. Wait for rate limit to reset (24 hours from first request)
+  2. Add 10 credits to your OpenRouter account for 1,000 requests/day
+  3. Use a different OpenRouter account temporarily
+- **Check limit reset time**: Look at error message for reset timestamp
+- **Upgrade**: Visit [openrouter.ai/credits](https://openrouter.ai/credits)
 
 **"ModuleNotFoundError: No module named '_griffe'"**
 - Solution: Pin griffe to version 1.5.0 (already in requirements.txt)

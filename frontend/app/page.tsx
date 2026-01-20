@@ -93,7 +93,18 @@ export default function Home() {
       const data = await response.json();
       setResult(data);
     } catch (err: any) {
-      setError(err.message || 'Failed to review code. Please try again.');
+      // Enhanced error handling for rate limits
+      let errorMessage = err.message || 'Failed to review code. Please try again.';
+      
+      if (err.message?.includes('Rate limit exceeded') || err.message?.includes('429')) {
+        errorMessage = '⏱️ Free model rate limit reached (50 requests/day). The limit resets in a few hours. For unlimited access, consider adding credits to your OpenRouter account.';
+      } else if (err.message?.includes('AI service unavailable')) {
+        errorMessage = '🔄 AI model is temporarily overloaded. Please try again in a few moments.';
+      } else if (err.message?.includes('Empty response')) {
+        errorMessage = '⚠️ The AI model returned an empty response. This usually means it\'s overloaded. Please try again shortly.';
+      }
+      
+      setError(errorMessage);
       console.error('Review error:', err);
     } finally {
       setLoading(false);
@@ -133,6 +144,15 @@ export default function Home() {
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
             Get detailed feedback on bugs, security issues, performance, and code quality
           </p>
+          
+          {/* Rate Limit Notice */}
+          <div className="mt-6 max-w-2xl mx-auto">
+            <div className="bg-amber-900/20 border border-amber-500/30 rounded-lg p-3">
+              <p className="text-amber-200 text-sm">
+                ℹ️ <strong>Free tier:</strong> 50 requests per day. Limit resets every 24 hours.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Editor Section */}
