@@ -6,6 +6,7 @@ from pydantic_ai.models.openai import OpenAIModel
 import os
 from typing import List, Optional
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
 
@@ -118,11 +119,35 @@ async def review_code(request: CodeReviewRequest):
 
 Provide a comprehensive code review with scores, bugs, security issues, performance tips, and refactoring suggestions."""
 
-        # Run the agent
-        result = await agent.run(prompt)
+        # Run the agent with retry logic
+        max_retries = 3
+        last_error = None
         
-        return result.data
+        for attempt in range(max_retries):
+            try:
+                result = await agent.run(prompt)
+                
+                if result and result.data:
+                    return result.data
+                else:
+                    last_error = "Empty response from AI model"
+                    if attempt < max_retries - 1:
+                        await asyncio.sleep(2)  # Wait before retry
+                        continue
+                        
+            except Exception as e:
+                last_error = str(e)
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(2)
+                    continue
+                    
+        raise HTTPException(
+            status_code=503,
+            detail=f"AI service unavailable after {max_retries} attempts. The free model may be overloaded. Please try again in a few moments. Error: {last_error}"
+        )
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=500,
