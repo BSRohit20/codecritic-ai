@@ -73,7 +73,7 @@ http_client = httpx.AsyncClient(
 )
 
 model = OpenAIModel(
-    model_name="deepseek/deepseek-r1-0528:free",  # DeepSeek R1 - free reasoning model
+    model_name="meta-llama/llama-3.3-70b-instruct:free",  # Llama 3.3 70B - back to original
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPENROUTER_API_KEY", ""),
     http_client=http_client
