@@ -27,7 +27,7 @@ An intelligent, full-stack AI-powered code review assistant built with Pydantic 
 
 ### 🤖 Powered by Advanced AI
 - **Pydantic AI**: Structured, type-safe AI outputs
-- **Llama 3.3 70B**: Free, powerful language model via OpenRouter
+- **Mistral Devstral 2512**: Free, powerful AI model optimized for code via OpenRouter
 - **Intelligent Retries**: Automatic retry logic for reliability
 - **Detailed Error Handling**: Clear feedback when issues occur
 
@@ -41,7 +41,7 @@ An intelligent, full-stack AI-powered code review assistant built with Pydantic 
 ### Backend
 - **FastAPI 0.115.0**: High-performance async Python web framework
 - **Pydantic AI 0.0.14**: Type-safe AI agent with structured outputs
-- **OpenRouter API**: Access to Llama 3.3 70B (free tier)
+- **OpenRouter API**: Access to Mistral Devstral 2512 (free tier, code-optimized)
 - **Python 3.13.4**: Latest Python with improved performance
 - **Uvicorn**: Lightning-fast ASGI server
 
