@@ -73,7 +73,7 @@ http_client = httpx.AsyncClient(
 )
 
 model = OpenAIModel(
-    model_name="google/gemini-flash-1.5:free",  # Gemini Flash 1.5 - confirmed tool support
+    model_name="deepseek/deepseek-r1-0528:free",  # DeepSeek R1 - free reasoning model
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPENROUTER_API_KEY", ""),
     http_client=http_client
