@@ -128,16 +128,38 @@ Provide a comprehensive code review with scores, bugs, security issues, performa
                 # Disable streaming to support tool/function calling
                 result = await agent.run(prompt, model_settings={"stream": False})
                 
-                if result and result.data:
-                    return result.data
+                # Validate result has required data
+                if result and hasattr(result, 'data') and result.data:
+                    # Additional validation of data structure
+                    data = result.data
+                    if not isinstance(data, CodeReviewResult):
+                        # Try to convert if it's a dict
+                        if isinstance(data, dict):
+                            data = CodeReviewResult(**data)
+                        else:
+                            raise ValueError(f"Invalid response type: {type(data)}")
+                    
+                    # Ensure overall_score is an integer
+                    if not isinstance(data.overall_score, int):
+                        if data.overall_score is None:
+                            data.overall_score = 70  # Default score
+                        else:
+                            data.overall_score = int(float(data.overall_score))
+                    
+                    return data
                 else:
-                    last_error = "Empty response from AI model"
+                    last_error = "Empty or invalid response from AI model"
                     if attempt < max_retries - 1:
                         await asyncio.sleep(2)  # Wait before retry
                         continue
                         
+            except ValueError as ve:
+                last_error = f"Data validation error: {str(ve)}"
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(2)
+                    continue
             except Exception as e:
-                last_error = str(e)
+                last_error = f"{type(e).__name__}: {str(e)}"
                 if attempt < max_retries - 1:
                     await asyncio.sleep(2)
                     continue
