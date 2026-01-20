@@ -61,10 +61,16 @@ class CodeReviewRequest(BaseModel):
 
 # Initialize Pydantic AI Agent
 # Using Llama 3.3 70B - free model with function calling support
+import httpx
+
+# Create HTTP client with timeout
+http_client = httpx.AsyncClient(timeout=120.0)
+
 model = OpenAIModel(
     model_name="meta-llama/llama-3.3-70b-instruct:free",  # Free Llama 3.3 70B
     base_url="https://openrouter.ai/api/v1",
-    api_key=os.getenv("OPENROUTER_API_KEY", "")
+    api_key=os.getenv("OPENROUTER_API_KEY", ""),
+    http_client=http_client
 )
 
 agent = Agent(
@@ -125,8 +131,17 @@ Provide a comprehensive code review with scores, bugs, security issues, performa
         
         for attempt in range(max_retries):
             try:
-                # Disable streaming to support tool/function calling
-                result = await agent.run(prompt, model_settings={"stream": False})
+                # Disable streaming explicitly with proper parameter name
+                # OpenAI API uses 'stream' parameter
+                result = await agent.run(
+                    prompt,
+                    model_settings={
+                        "stream": False,
+                        "temperature": 0.7,
+                        "max_tokens": 2000
+                    },
+                    infer_name=False  # Avoid extra API calls
+                )
                 
                 # Validate result has required data
                 if result and hasattr(result, 'data') and result.data:
