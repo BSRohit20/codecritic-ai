@@ -1,242 +1,395 @@
-# AI Code Review Assistant 🚀
+# CodeCritic AI 🚀
 
-A full-stack generative AI application that provides instant, comprehensive code reviews using Pydantic AI. Built for developers who want fast, intelligent feedback on their code quality, security, and performance.
+An intelligent, full-stack AI-powered code review assistant built with Pydantic AI and modern web technologies. Get instant, comprehensive feedback on code quality, security vulnerabilities, performance issues, and refactoring opportunities.
 
-## 🎯 Features
+## 🌐 Live Demo
 
-- **Instant Code Analysis**: Get AI-powered reviews in seconds
-- **Comprehensive Feedback**:
-  - Overall quality score (0-100)
-  - Bug detection with severity levels
-  - Security vulnerability scanning
-  - Performance optimization tips
-  - Refactoring suggestions
+- **Frontend**: [https://codecritic-ai.vercel.app](https://codecritic-ai.vercel.app)
+- **Backend API**: [https://codecritic-ai-backend.onrender.com](https://codecritic-ai-backend.onrender.com)
+- **GitHub**: [https://github.com/BSRohit20/codecritic-ai](https://github.com/BSRohit20/codecritic-ai)
+
+## ✨ Key Features
+
+### 🎯 Comprehensive Code Analysis
+- **Quality Scoring**: Get an overall code quality score (0-100)
+- **Bug Detection**: Identify potential bugs with severity ratings (critical, high, medium, low)
+- **Security Scanning**: Detect security vulnerabilities and get remediation advice
+- **Performance Tips**: Receive optimization suggestions to improve code efficiency
+- **Refactoring Guidance**: View side-by-side code comparisons for better implementations
+
+### 🎨 Premium User Experience
+- **Line Numbers**: Professional code editor with line numbering
+- **One-Click Copy**: Copy suggestions directly to clipboard with visual feedback
+- **Side-by-Side Comparison**: View current vs. improved code for refactoring suggestions
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Loading States**: Smooth animations while AI analyzes your code
 - **Multi-Language Support**: JavaScript, TypeScript, Python, Java, C++, Go, Rust, PHP, Ruby
-- **Beautiful UI**: Modern, responsive design with smooth animations
-- **Real-time Results**: See detailed analysis with color-coded categories
+
+### 🤖 Powered by Advanced AI
+- **Pydantic AI**: Structured, type-safe AI outputs
+- **Llama 3.3 70B**: Free, powerful language model via OpenRouter
+- **Intelligent Retries**: Automatic retry logic for reliability
+- **Detailed Error Handling**: Clear feedback when issues occur
 
 ## 🏗️ Tech Stack
 
 ### Backend
-- **FastAPI**: High-performance Python web framework
-- **Pydantic AI**: Structured AI agent outputs
-- **OpenRouter**: Free AI models (Llama 3.2 3B)
-- **Python 3.10+**
+- **FastAPI 0.115.0**: High-performance async Python web framework
+- **Pydantic AI 0.0.14**: Type-safe AI agent with structured outputs
+- **OpenRouter API**: Access to Llama 3.3 70B (free tier)
+- **Python 3.13.4**: Latest Python with improved performance
+- **Uvicorn**: Lightning-fast ASGI server
 
 ### Frontend
-- **Next.js 14**: React framework with App Router
-- **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first styling
-- **Lucide Icons**: Beautiful icon set
+- **Next.js 15.5.9**: React framework with App Router and server components
+- **React 18.3.1**: Modern React with concurrent features
+- **TypeScript**: Full type safety across the application
+- **Tailwind CSS 3.4.0**: Utility-first CSS framework
+- **Lucide React**: Beautiful, consistent icon library
+
+### Deployment & DevOps
+- **Vercel**: Frontend hosting with automatic deployments
+- **Render**: Backend hosting with auto-deploy from GitHub
+- **Git & GitHub**: Version control and CI/CD
 
 ## 📋 Prerequisites
 
-- Python 3.10 or higher
-- Node.js 18 or higher
+- Python 3.10+ (3.13.4 recommended)
+- Node.js 18+ 
 - OpenRouter API key (free at [openrouter.ai](https://openrouter.ai))
 
-## 🚀 Getting Started
+## 🚀 Local Development Setup
 
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd "Potpie AI"
+git clone https://github.com/BSRohit20/codecritic-ai.git
+cd codecritic-ai
 ```
 
 ### 2. Backend Setup
 
 ```bash
-# Navigate to backend
+# Navigate to backend directory
 cd backend
 
-# Create virtual environment
+# Create virtual environment (recommended)
 python -m venv venv
 
 # Activate virtual environment
-# On Windows:
+# Windows:
 venv\Scripts\activate
-# On macOS/Linux:
+# macOS/Linux:
 source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
 
-# Create .env file
-copy .env.example .env
-
-# Add your OpenRouter API key to .env
-# OPENROUTER_API_KEY=your_api_key_here
+# Create .env file with your API key
+echo OPENROUTER_API_KEY=your_key_here > .env
 ```
+
+**Get your free OpenRouter API key:**
+1. Visit [openrouter.ai](https://openrouter.ai)
+2. Sign up (free)
+3. Go to Keys section
+4. Create new API key
+5. Copy to `.env` file
 
 ### 3. Frontend Setup
 
 ```bash
-# Navigate to frontend (open new terminal)
+# Open new terminal, navigate to frontend
 cd frontend
 
 # Install dependencies
 npm install
 
 # Create environment file
-copy .env.local.example .env.local
-
-# Update API URL if needed (default: http://localhost:8000)
+echo NEXT_PUBLIC_API_URL=http://localhost:8000 > .env.local
 ```
 
 ### 4. Run the Application
 
-**Terminal 1 - Backend:**
+**Terminal 1 - Start Backend:**
 ```bash
 cd backend
 python main.py
-# Backend runs on http://localhost:8000
+# 🚀 Backend running at http://localhost:8000
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 2 - Start Frontend:**
 ```bash
 cd frontend
 npm run dev
-# Frontend runs on http://localhost:3000
+# ✨ Frontend running at http://localhost:3000
 ```
 
-### 5. Open in Browser
+**Open your browser:** [http://localhost:3000](http://localhost:3000)
 
-Visit [http://localhost:3000](http://localhost:3000) and start reviewing code!
+## 🌍 Production Deployment
 
-## 🔑 Getting OpenRouter API Key
+### Backend Deployment (Render)
 
-1. Go to [openrouter.ai](https://openrouter.ai)
-2. Sign up for a free account
-3. Navigate to Keys section
-4. Create a new API key
-5. Copy the key to your `backend/.env` file
+1. **Create Web Service** on [render.com](https://render.com)
+2. **Connect GitHub repository**: `BSRohit20/codecritic-ai`
+3. **Configure Settings**:
+   - **Root Directory**: `backend`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+4. **Add Environment Variables**:
+   - `OPENROUTER_API_KEY`: Your OpenRouter API key
+5. **Deploy** (auto-deploys on git push)
 
-**Free Model Used**: `meta-llama/llama-3.2-3b-instruct:free`
+### Frontend Deployment (Vercel)
 
-## 📦 Deployment
+1. **Import Project** on [vercel.com](https://vercel.com)
+2. **Connect GitHub repository**: `BSRohit20/codecritic-ai`
+3. **Configure Settings**:
+   - **Root Directory**: `frontend`
+   - **Framework Preset**: Next.js
+4. **Add Environment Variables**:
+   - `NEXT_PUBLIC_API_URL`: Your backend URL (e.g., `https://codecritic-ai-backend.onrender.com`)
+5. **Deploy** (auto-deploys on git push)
 
-### Deploy Backend (Railway/Render)
-
-**Railway:**
-1. Connect GitHub repo to Railway
-2. Select `backend` as root directory
-3. Add environment variable: `OPENROUTER_API_KEY`
-4. Deploy
-
-**Render:**
-1. Create new Web Service
-2. Connect GitHub repo
-3. Root Directory: `backend`
-4. Build Command: `pip install -r requirements.txt`
-5. Start Command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-6. Add environment variable: `OPENROUTER_API_KEY`
-
-### Deploy Frontend (Vercel)
-
-1. Connect GitHub repo to Vercel
-2. Root Directory: `frontend`
-3. Framework Preset: Next.js
-4. Add environment variable: `NEXT_PUBLIC_API_URL` (your backend URL)
-5. Deploy
-
-## 🎨 Project Structure
+## 📁 Project Structure
 
 ```
-Potpie AI/
+codecritic-ai/
 ├── backend/
-│   ├── main.py              # FastAPI app with Pydantic AI agent
+│   ├── main.py              # FastAPI application with Pydantic AI agent
 │   ├── requirements.txt     # Python dependencies
-│   └── .env.example         # Environment template
+│   ├── .env                 # Environment variables (not in git)
+│   └── .gitignore          # Python/backend ignores
+│
 ├── frontend/
 │   ├── app/
-│   │   ├── page.tsx         # Main page
-│   │   ├── layout.tsx       # Root layout
-│   │   └── globals.css      # Global styles
+│   │   ├── page.tsx         # Main application page
+│   │   ├── layout.tsx       # Root layout with metadata
+│   │   ├── globals.css      # Global styles
+│   │   └── favicon.ico      # App icon
 │   ├── components/
-│   │   ├── CodeEditor.tsx   # Code input component
-│   │   ├── ReviewResults.tsx # Results display
-│   │   └── LoadingState.tsx # Loading UI
-│   ├── package.json
-│   └── .env.local.example
-└── README.md
+│   │   ├── CodeEditor.tsx   # Code input with line numbers
+│   │   ├── ReviewResults.tsx # AI review display with copy buttons
+│   │   └── LoadingState.tsx  # Loading animation
+│   ├── package.json         # Node dependencies
+│   ├── tsconfig.json        # TypeScript configuration
+│   ├── tailwind.config.ts   # Tailwind CSS configuration
+│   ├── next.config.js       # Next.js configuration
+│   └── .gitignore          # Node/frontend ignores
+│
+├── README.md               # This file
+├── render.yaml            # Render deployment config
+└── .gitignore            # Root gitignore
 ```
 
-## 🧪 Testing the App
+## 🎯 How to Use
 
-1. Open the app at http://localhost:3000
-2. Paste sample code or use the default example
-3. Select programming language
-4. Click "Review Code"
-5. View comprehensive analysis with:
-   - Overall score
-   - Strengths
-   - Bugs & issues
-   - Security vulnerabilities
-   - Performance tips
-   - Refactoring suggestions
+1. **Open the App**: Visit [codecritic-ai.vercel.app](https://codecritic-ai.vercel.app)
+2. **Paste Your Code**: Copy code you want reviewed into the editor
+3. **Select Language**: Choose from 9 supported languages
+4. **Click "Review Code"**: Wait 10-30 seconds for AI analysis
+5. **View Results**: See comprehensive feedback with:
+   - ✅ Overall quality score
+   - 💡 Code strengths
+   - 🐛 Bugs with severity levels
+   - 🔒 Security vulnerabilities
+   - ⚡ Performance optimizations
+   - 🔄 Refactoring suggestions (with side-by-side code comparison)
+6. **Copy Suggestions**: Use copy buttons to grab specific recommendations
 
-## 🎥 Demo Video Requirements
+## 🔧 Key Technical Decisions
 
-For submission, record a 1-minute Loom video showing:
-1. Your face (required)
-2. Live demo of the application
-3. Paste code → Click review → Show results
-4. Brief explanation of tech stack
-5. One unique feature highlight
+### Why Llama 3.3 70B?
+- **Function Calling Support**: Required for Pydantic AI structured outputs
+- **Free Tier**: Cost-effective for demonstration
+- **Quality**: 70B parameters provide detailed, accurate reviews
+- **Reliability**: Tested multiple models; this one had best success rate
 
-## 📝 Submission Checklist
+### Why Pydantic AI?
+- **Type Safety**: Structured outputs guarantee consistent response format
+- **Validation**: Automatic data validation prevents runtime errors
+- **Developer Experience**: Clear, typed interfaces for AI responses
+- **Framework Agnostic**: Works with any Python backend
 
-- [ ] Live deployed URL (Vercel + Railway/Render)
-- [ ] Public GitHub repository
-- [ ] 1-minute Loom video with face visible
-- [ ] Resume in PDF format
-- [ ] All submitted via Google Form
+### Architecture Highlights
+- **Separation of Concerns**: Clear backend/frontend split
+- **Type Safety**: TypeScript frontend + Pydantic backend
+- **Error Handling**: Retry logic, timeouts, clear error messages
+- **User Experience**: Loading states, copy buttons, responsive design
+- **Production Ready**: CORS configured, environment variables, deployment configs
 
-## 🔥 Key Selling Points for Hiring Process
+## 🧪 Testing the Application
 
-✅ **Full-Stack**: Complete backend + frontend integration  
-✅ **Modern Stack**: Latest Next.js, FastAPI, Pydantic AI  
-✅ **Production Ready**: Error handling, loading states, validation  
-✅ **Great UX**: Smooth animations, responsive, polished design  
-✅ **Real Value**: Solves actual developer pain point  
-✅ **Scalable**: Clean architecture, modular components  
+### Sample Code to Try:
+
+**JavaScript (with intentional issues):**
+```javascript
+function addNumbers(a, b) {
+  return a + b;
+}
+
+var userPassword = "admin123";
+console.log(userPassword);
+
+let data = [];
+for (var i = 0; i < 10000; i++) {
+  data.push(i);
+}
+```
+
+**Expected Analysis:**
+- Bug: `var` scope issue in loop
+- Security: Hardcoded password
+- Performance: Inefficient array building
+- Refactoring: Use const/let, Array.from()
+
+## 🎥 Demo Video
+
+For hiring assessment submission, create 1-minute Loom video showing:
+1. ✅ Your face visible (required)
+2. 🖥️ Live demo of deployed app
+3. 📝 Paste code → Submit → View results
+4. 💬 Brief tech stack mention
+5. ✨ Highlight unique feature (e.g., side-by-side comparison)
+
+## � Unique Features & Selling Points
+
+### For Hiring Assessment:
+✅ **Full-Stack Mastery**: Complete end-to-end implementation  
+✅ **Modern Tech Stack**: Latest Next.js 15, FastAPI, Pydantic AI  
+✅ **Production-Grade**: Deployed, live, and functional  
+✅ **Excellent UX**: Line numbers, copy buttons, side-by-side comparisons  
+✅ **Real Problem Solved**: Addresses actual developer pain points  
+✅ **Clean Architecture**: Modular, maintainable, scalable code  
+✅ **Error Resilience**: Retry logic, timeout handling, clear error messages  
+✅ **Type Safety**: Full TypeScript + Pydantic validation  
+
+### Standout Features:
+1. **Side-by-Side Code Comparison**: Unique visual refactoring suggestions
+2. **One-Click Copy**: Every suggestion has instant clipboard copy
+3. **Line Numbers in Editor**: Professional code editor experience
+4. **Intelligent Retries**: Handles API failures gracefully
+5. **Multi-Severity Ratings**: Critical/High/Medium/Low issue classification
+6. **Comprehensive Analysis**: Bugs, security, performance, refactoring in one view
 
 ## 🐛 Troubleshooting
 
-**Backend won't start:**
-- Check Python version: `python --version` (need 3.10+)
-- Verify API key in `.env` file
-- Check port 8000 is not in use
+### Backend Issues
 
-**Frontend won't start:**
-- Check Node version: `node --version` (need 18+)
-- Clear cache: `rm -rf .next`
-- Reinstall: `rm -rf node_modules && npm install`
+**"ModuleNotFoundError: No module named '_griffe'"**
+- Solution: Pin griffe to version 1.5.0 (already in requirements.txt)
+- Run: `pip install griffe==1.5.0`
 
-**CORS errors:**
-- Update `NEXT_PUBLIC_API_URL` in frontend `.env.local`
-- Check backend CORS settings in `main.py`
+**"Empty model response" errors**
+- Cause: Free model rate limits or overload
+- Solution: Retry after a few seconds (automatic retry logic included)
+- Alternative: Consider upgrading to paid model if persistent
 
-**API errors:**
-- Verify OpenRouter API key is valid
-- Check API key has credits
-- Review backend logs for errors
+**Port already in use**
+- Check: `netstat -ano | findstr :8000` (Windows)
+- Kill process or use different port in main.py
 
-## 📧 Support
+### Frontend Issues
 
-For issues or questions, check:
-- [Pydantic AI Docs](https://ai.pydantic.dev)
-- [FastAPI Docs](https://fastapi.tiangolo.com)
-- [Next.js Docs](https://nextjs.org/docs)
-- [OpenRouter Docs](https://openrouter.ai/docs)
+**CORS errors**
+- Verify `NEXT_PUBLIC_API_URL` points to correct backend
+- Check backend CORS middleware allows your frontend origin
 
-## 📄 License
+**Build fails**
+- Clear Next.js cache: `rm -rf .next`
+- Reinstall dependencies: `rm -rf node_modules && npm install`
+- Verify Node.js version: `node --version` (need 18+)
 
-MIT License - feel free to use for your assessment!
+**Type errors**
+- Ensure frontend interfaces match backend Pydantic models exactly
+- Check imports and paths
+
+### Deployment Issues
+
+**Render: "Cannot find main.py"**
+- Solution: Set Root Directory to `backend` in Render dashboard
+- Settings → Root Directory → `backend` → Save
+
+**Vercel: Build fails**
+- Check Root Directory is set to `frontend`
+- Verify all environment variables are set
+- Check build logs for specific errors
+
+## 📚 API Documentation
+
+### Endpoints
+
+**GET /**
+```json
+{
+  "message": "AI Code Review Assistant API",
+  "version": "1.0.0",
+  "status": "healthy"
+}
+```
+
+**GET /health**
+```json
+{
+  "status": "healthy",
+  "api_configured": true
+}
+```
+
+**POST /api/review**
+
+Request:
+```json
+{
+  "code": "function example() { return 42; }",
+  "language": "javascript"
+}
+```
+
+Response:
+```json
+{
+  "overall_score": 85,
+  "summary": "Clean function with good practices",
+  "strengths": ["Clear function name", "Simple logic"],
+  "bugs": [],
+  "security_issues": [],
+  "performance_tips": [],
+  "refactoring_suggestions": []
+}
+```
+
+## 🤝 Contributing
+
+This is a hiring assessment project, but feedback is welcome!
+
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/improvement`
+3. Commit changes: `git commit -m 'Add improvement'`
+4. Push to branch: `git push origin feature/improvement`
+5. Open Pull Request
+
+## 📜 License
+
+MIT License - Free to use for assessments and learning!
+
+## 🙏 Acknowledgments
+
+- **Pydantic AI**: Amazing framework for structured AI outputs
+- **OpenRouter**: Free access to Llama models
+- **FastAPI**: High-performance Python web framework
+- **Next.js**: Excellent React framework
+- **Vercel & Render**: Free deployment platforms
+
+## 📞 Contact
+
+- **GitHub**: [@BSRohit20](https://github.com/BSRohit20)
+- **Email**: bsrohit20@gmail.com
+- **Project**: [codecritic-ai](https://github.com/BSRohit20/codecritic-ai)
 
 ---
 
-**Built with ❤️ using Pydantic AI**
+**Built with ❤️ and AI for developer productivity**
 
-Good luck with your submission! 🚀
+🚀 **Live Demo**: [codecritic-ai.vercel.app](https://codecritic-ai.vercel.app)
