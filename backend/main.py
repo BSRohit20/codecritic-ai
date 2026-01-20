@@ -125,7 +125,8 @@ Provide a comprehensive code review with scores, bugs, security issues, performa
         
         for attempt in range(max_retries):
             try:
-                result = await agent.run(prompt)
+                # Disable streaming to support tool/function calling
+                result = await agent.run(prompt, model_settings={"stream": False})
                 
                 if result and result.data:
                     return result.data
