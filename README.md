@@ -399,7 +399,6 @@ MIT License - Free to use for assessments and learning!
 ## 📞 Contact
 
 - **GitHub**: [@BSRohit20](https://github.com/BSRohit20)
-- **Email**: bsrohit20@gmail.com
 - **Project**: [codecritic-ai](https://github.com/BSRohit20/codecritic-ai)
 
 ---
@@ -407,3 +406,4 @@ MIT License - Free to use for assessments and learning!
 **Built with ❤️ and AI for developer productivity**
 
 🚀 **Live Demo**: [codecritic-ai.vercel.app](https://codecritic-ai.vercel.app)
+
