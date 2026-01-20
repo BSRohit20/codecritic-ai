@@ -63,11 +63,17 @@ class CodeReviewRequest(BaseModel):
 # Using Llama 3.3 70B - free model with function calling support
 import httpx
 
-# Create HTTP client with timeout
-http_client = httpx.AsyncClient(timeout=120.0)
+# Create HTTP client with custom headers to disable streaming
+http_client = httpx.AsyncClient(
+    timeout=120.0,
+    headers={
+        "HTTP-Referer": "https://codecritic-ai.vercel.app",
+        "X-Title": "CodeCritic AI"
+    }
+)
 
 model = OpenAIModel(
-    model_name="meta-llama/llama-3.3-70b-instruct:free",  # Free Llama 3.3 70B
+    model_name="google/gemini-2.0-flash-exp:free",  # Gemini 2.0 Flash - better tool support
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPENROUTER_API_KEY", ""),
     http_client=http_client
