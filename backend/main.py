@@ -45,6 +45,12 @@ class RefactoringSuggestion(BaseModel):
     current_code: str = Field(..., description="Current problematic code snippet")
     improved_code: str = Field(..., description="Improved code after refactoring")
 
+class ComplexityAnalysis(BaseModel):
+    time_complexity: str = Field(..., description="Big O time complexity like O(n), O(n^2)")
+    space_complexity: str = Field(..., description="Big O space complexity")
+    explanation: str = Field(..., description="Explanation of complexity analysis")
+    optimization_potential: str = Field(..., description="Potential for optimization")
+
 class CodeReviewResult(BaseModel):
     overall_score: int = Field(..., ge=0, le=100, description="Overall code quality score 0-100")
     summary: str = Field(..., description="Brief summary of the code review")
@@ -53,6 +59,7 @@ class CodeReviewResult(BaseModel):
     security_issues: List[SecurityIssue] = Field(default_factory=list, description="Security vulnerabilities")
     performance_tips: List[PerformanceTip] = Field(default_factory=list, description="Performance improvements")
     refactoring_suggestions: List[RefactoringSuggestion] = Field(default_factory=list, description="Refactoring recommendations")
+    complexity_analysis: Optional[ComplexityAnalysis] = Field(None, description="Algorithm complexity analysis")
 
 # Request model
 class CodeReviewRequest(BaseModel):
@@ -99,8 +106,10 @@ Your task is to thoroughly review code and provide:
    - Insecure dependencies
 6. Performance optimization opportunities
 7. Refactoring suggestions for better code quality
+8. Algorithm complexity analysis (Big O notation for time and space complexity)
 
 IMPORTANT: You must ALWAYS check for security issues. If the code looks secure, you can return an empty security_issues list, but always perform the scan.
+When analyzing algorithms or loops, provide complexity analysis with time/space complexity.
 Be constructive, specific, and actionable. Focus on real issues, not nitpicks.
 Provide line numbers when possible. Be encouraging about good practices while highlighting improvements.
 """
@@ -205,6 +214,59 @@ Provide a comprehensive code review with scores, bugs, security issues, performa
             status_code=500,
             detail=f"Error during code review: {str(e)}"
         )
+
+# Chat endpoint for follow-up questions
+class ChatRequest(BaseModel):
+    message: str = Field(..., description="User's question")
+    code: str = Field(..., description="The code being discussed")
+    language: str = Field(..., description="Programming language")
+    review_context: dict = Field(..., description="Previous review results")
+    chat_history: List[dict] = Field(default_factory=list, description="Previous messages")
+
+@app.post("/api/chat")
+async def chat_about_review(request: ChatRequest):
+    """
+    Interactive chat about code review results
+    """
+    try:
+        if not os.getenv("OPENROUTER_API_KEY"):
+            raise HTTPException(status_code=500, detail="API key not configured")
+        
+        # Create chat agent for follow-up questions
+        chat_agent = Agent(
+            model=model,
+            result_type=str,
+            system_prompt=f"""You are a helpful AI code review assistant. A user has received a code review and has follow-up questions.
+
+Code being discussed:
+```{request.language}
+{request.code}
+```
+
+Review Summary:
+- Quality Score: {request.review_context.get('overall_score', 'N/A')}/100
+- Bugs Found: {len(request.review_context.get('bugs', []))}
+- Security Issues: {len(request.review_context.get('security_issues', []))}
+- Performance Tips: {len(request.review_context.get('performance_tips', []))}
+
+Provide helpful, detailed answers to the user's questions about their code review.
+Be specific and reference line numbers when relevant. Provide code examples when helpful."""
+        )
+        
+        # Build conversation context
+        conversation = "\n".join([
+            f"{'User' if msg['role'] == 'user' else 'Assistant'}: {msg['content']}"
+            for msg in request.chat_history[-6:]  # Last 6 messages
+        ])
+        
+        prompt = f"{conversation}\nUser: {request.message}"
+        
+        result = await chat_agent.run(prompt)
+        
+        return {"response": result.data}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

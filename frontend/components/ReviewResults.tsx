@@ -3,12 +3,16 @@
 import { CodeReviewResult } from '@/app/page';
 import { AlertCircle, Shield, Zap, RefreshCw, CheckCircle2, TrendingUp, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
+import DiffViewer from './DiffViewer';
+import PerformanceBenchmark from './PerformanceBenchmark';
 
 interface ReviewResultsProps {
   result: CodeReviewResult;
+  onApplyCode?: (code: string) => void;
+  language?: string;
 }
 
-export default function ReviewResults({ result }: ReviewResultsProps) {
+export default function ReviewResults({ result, onApplyCode, language = 'javascript' }: ReviewResultsProps) {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const copyToClipboard = (text: string, id: string) => {
@@ -216,7 +220,7 @@ export default function ReviewResults({ result }: ReviewResultsProps) {
         </div>
       )}
 
-      {/* Refactoring Suggestions Section */}
+      {/* Refactoring Suggestions Section with DiffViewer */}
       {result.refactoring_suggestions && result.refactoring_suggestions.length > 0 && (
         <div className="bg-slate-800/50 border-2 border-slate-700 rounded-lg p-6">
           <div className="flex items-center gap-2 mb-4">
@@ -228,49 +232,24 @@ export default function ReviewResults({ result }: ReviewResultsProps) {
           </div>
           <div className="space-y-4">
             {result.refactoring_suggestions.map((suggestion, index) => (
-              <div
+              <DiffViewer
                 key={index}
-                className="border-l-4 border-blue-500/50 bg-blue-900/20 p-4 rounded-r"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-blue-400" />
-                    <span className="text-slate-400 text-xs">Lines {suggestion.line_range || 'N/A'}</span>
-                  </div>
-                  {suggestion.improved_code && (
-                    <button
-                      onClick={() => copyToClipboard(suggestion.improved_code, `refactor-${index}`)}
-                      className="p-2 hover:bg-slate-700 rounded transition-colors"
-                      title="Copy improved code"
-                    >
-                      {copiedId === `refactor-${index}` ? (
-                        <Check className="w-4 h-4 text-green-400" />
-                      ) : (
-                        <Copy className="w-4 h-4 text-slate-400" />
-                      )}
-                    </button>
-                  )}
-                </div>
-                <p className="text-white mb-3">{suggestion.description || 'No description provided'}</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <div className="text-xs text-red-400 mb-1 font-semibold">Current Code:</div>
-                    <div className="bg-slate-900/50 rounded p-2 text-sm font-mono text-slate-300 whitespace-pre-wrap">
-                      {suggestion.current_code || 'N/A'}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-green-400 mb-1 font-semibold">Improved Code:</div>
-                    <div className="bg-slate-900/50 rounded p-2 text-sm font-mono text-slate-300 whitespace-pre-wrap">
-                      {suggestion.improved_code || 'N/A'}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                originalCode={suggestion.current_code || 'N/A'}
+                improvedCode={suggestion.improved_code || 'N/A'}
+                language={language}
+                description={`Lines ${suggestion.line_range || 'N/A'}: ${suggestion.description || 'No description provided'}`}
+                onApply={onApplyCode}
+              />
             ))}
           </div>
         </div>
       )}
+
+      {/* Performance Benchmarking */}
+      <PerformanceBenchmark
+        complexityAnalysis={result.complexity_analysis}
+        performanceTips={result.performance_tips}
+      />
     </div>
   );
 }

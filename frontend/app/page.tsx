@@ -1,10 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Code2, Sparkles, AlertCircle, Shield, Zap, RefreshCw, CheckCircle2, XCircle } from 'lucide-react';
+import { Code2, Sparkles, AlertCircle, Shield, Zap, RefreshCw, CheckCircle2, XCircle, History, BookOpen } from 'lucide-react';
 import CodeEditor from '@/components/CodeEditor';
 import ReviewResults from '@/components/ReviewResults';
 import LoadingState from '@/components/LoadingState';
+import ChatAssistant from '@/components/ChatAssistant';
+import CodeHistory from '@/components/CodeHistory';
+import SnippetLibrary from '@/components/SnippetLibrary';
+import Collaboration from '@/components/Collaboration';
 
 export interface CodeReviewResult {
   overall_score: number;
@@ -33,6 +37,12 @@ export interface CodeReviewResult {
     current_code: string;
     improved_code: string;
   }>;
+  complexity_analysis?: {
+    time_complexity: string;
+    space_complexity: string;
+    explanation: string;
+    optimization_potential: string;
+  };
 }
 
 const LANGUAGE_OPTIONS = [
@@ -61,6 +71,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CodeReviewResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
 
   const handleReview = async () => {
     if (!code.trim()) {
@@ -163,17 +174,32 @@ export default function Home() {
                 <Code2 className="w-5 h-5 text-primary-400" />
                 Your Code
               </h3>
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              <div className="flex items-center gap-2">
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  {LANGUAGE_OPTIONS.map((lang) => (
+                    <option key={lang.value} value={lang.value}>
+                      {lang.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Feature Buttons Row */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={() => setShowHistory(!showHistory)}
+                className="flex items-center gap-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors"
               >
-                {LANGUAGE_OPTIONS.map((lang) => (
-                  <option key={lang.value} value={lang.value}>
-                    {lang.label}
-                  </option>
-                ))}
-              </select>
+                <History className="w-4 h-4" />
+                History
+              </button>
+              <SnippetLibrary />
+              <Collaboration code={code} language={language} reviewResult={result} />
             </div>
 
             <CodeEditor code={code} onChange={setCode} language={language} />
@@ -215,7 +241,7 @@ export default function Home() {
             </h3>
 
             {loading && <LoadingState />}
-            {result && <ReviewResults result={result} />}
+            {result && <ReviewResults result={result} onApplyCode={setCode} language={language} />}
             {!loading && !result && !error && (
               <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-12 text-center">
                 <Code2 className="w-16 h-16 text-slate-600 mx-auto mb-4" />
@@ -226,6 +252,20 @@ export default function Home() {
             )}
           </div>
         </div>
+
+        {/* Code History Section */}
+        {showHistory && (
+          <div className="mt-8 animate-in">
+            <CodeHistory />
+          </div>
+        )}
+
+        {/* Chat Assistant (Floating) */}
+        <ChatAssistant 
+          reviewResult={result} 
+          originalCode={code} 
+          language={language} 
+        />
 
         {/* Features */}
         <div className="grid md:grid-cols-4 gap-6 mt-16">
