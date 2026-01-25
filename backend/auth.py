@@ -18,14 +18,23 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 def truncate_password(password: str, max_bytes: int = 72) -> str:
-    """Truncate password to max_bytes ensuring valid UTF-8"""
+    """Truncate password to max_bytes ensuring valid UTF-8 and proper byte length"""
     encoded = password.encode('utf-8')
     if len(encoded) <= max_bytes:
         return password
-    # Truncate and find valid UTF-8 boundary
-    truncated = encoded[:max_bytes]
-    # Decode with replace to handle incomplete characters
-    return truncated.decode('utf-8', errors='ignore')
+    
+    # Truncate byte by byte until we get valid UTF-8 under max_bytes
+    for i in range(max_bytes, 0, -1):
+        try:
+            truncated = encoded[:i].decode('utf-8')
+            # Double-check the byte length
+            if len(truncated.encode('utf-8')) <= max_bytes:
+                return truncated
+        except UnicodeDecodeError:
+            continue
+    
+    # Fallback - should never reach here
+    return password[:max_bytes]
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
