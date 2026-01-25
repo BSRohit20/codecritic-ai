@@ -57,16 +57,8 @@ const LANGUAGE_OPTIONS = [
   { value: 'ruby', label: 'Ruby' },
 ];
 
-const SAMPLE_CODE = `function calculateTotal(items) {
-  var total = 0;
-  for (var i = 0; i < items.length; i++) {
-    total = total + items[i].price * items[i].quantity;
-  }
-  return total;
-}`;
-
 export default function Home() {
-  const [code, setCode] = useState(SAMPLE_CODE);
+  const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CodeReviewResult | null>(null);
