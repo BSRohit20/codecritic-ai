@@ -120,7 +120,7 @@ export default function SnippetLibrary() {
       {/* Library Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors"
+        className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-lg transition-colors"
       >
         <BookOpen className="w-4 h-4" />
         Snippet Library ({snippets.length})

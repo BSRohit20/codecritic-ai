@@ -79,7 +79,7 @@ export default function Collaboration({ code, language, reviewResult }: Collabor
       {/* Share Button */}
       <button
         onClick={() => setIsShareOpen(!isShareOpen)}
-        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
+        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded-lg transition-colors"
         disabled={!reviewResult}
       >
         <Share2 className="w-4 h-4" />

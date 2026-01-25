@@ -15,36 +15,60 @@ interface ReviewHistoryItem {
 export default function CodeHistory() {
   const [history, setHistory] = useState<ReviewHistoryItem[]>([]);
   const [selectedReview, setSelectedReview] = useState<ReviewHistoryItem | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadHistory();
   }, []);
 
-  const loadHistory = () => {
-    const stored = localStorage.getItem('codeReviewHistory');
-    if (stored) {
-      setHistory(JSON.parse(stored));
+  const loadHistory = async () => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(`${apiUrl}/api/history`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setHistory(data);
+      }
+    } catch (error) {
+      console.error('Failed to load history:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const saveToHistory = (language: string, code: string, result: CodeReviewResult) => {
-    const newItem: ReviewHistoryItem = {
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      language,
-      codeSnippet: code.substring(0, 100) + (code.length > 100 ? '...' : ''),
-      result
-    };
+  const clearHistory = async () => {
+    if (!confirm('Are you sure you want to clear all history?')) {
+      return;
+    }
 
-    const updated = [newItem, ...history].slice(0, 50); // Keep last 50 reviews
-    setHistory(updated);
-    localStorage.setItem('codeReviewHistory', JSON.stringify(updated));
-  };
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = localStorage.getItem('token');
 
-  const clearHistory = () => {
-    if (confirm('Are you sure you want to clear all history?')) {
-      setHistory([]);
-      localStorage.removeItem('codeReviewHistory');
+      const response = await fetch(`${apiUrl}/api/history`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setHistory([]);
+      }
+    } catch (error) {
+      console.error('Failed to clear history:', error);
     }
   };
 
@@ -85,7 +109,14 @@ export default function CodeHistory() {
 
   const trend = getScoreTrend();
   const avgScore = calculateAverageScore();
-
+  if (loading) {
+    return (
+      <div className="bg-slate-800/50 border border-slate-700 rounded-lg p-12 text-center">
+        <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-slate-400">Loading history...</p>
+      </div>
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Analytics Overview */}

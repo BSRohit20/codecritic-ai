@@ -1,16 +1,30 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from pydantic_ai import Agent
 from pydantic_ai.models.openai import OpenAIModel
 import os
 from typing import List, Optional
 from dotenv import load_dotenv
 import asyncio
+from datetime import datetime, timedelta
+from database import connect_to_mongo, close_mongo_connection, get_users_collection, database
+from auth import get_password_hash, verify_password, create_access_token, get_current_user
+import httpx
+from bson.objectid import ObjectId
 
 load_dotenv()
 
 app = FastAPI(title="AI Code Review Assistant", version="1.0.0")
+
+# Lifecycle events
+@app.on_event("startup")
+async def startup_db_client():
+    await connect_to_mongo()
+
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    await close_mongo_connection()
 
 # CORS configuration
 app.add_middleware(
@@ -267,6 +281,256 @@ Be specific and reference line numbers when relevant. Provide code examples when
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")
+
+# ==================== AUTH ENDPOINTS ====================
+
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str
+    name: str
+    captcha_token: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
+    captcha_token: str
+
+class CaptchaVerify(BaseModel):
+    token: str
+
+@app.post("/api/auth/verify-captcha")
+async def verify_captcha(request: CaptchaVerify):
+    """Verify Google reCAPTCHA token"""
+    try:
+        recaptcha_secret = os.getenv("RECAPTCHA_SECRET_KEY")
+        if not recaptcha_secret:
+            # For development, skip verification
+            return {"success": True, "score": 0.9}
+        
+        async with httpx.AsyncClient() as client:
+            response = await client.post(
+                "https://www.google.com/recaptcha/api/siteverify",
+                data={
+                    "secret": recaptcha_secret,
+                    "response": request.token
+                }
+            )
+            result = response.json()
+            return {
+                "success": result.get("success", False),
+                "score": result.get("score", 0)
+            }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"CAPTCHA verification failed: {str(e)}")
+
+@app.post("/api/auth/register")
+async def register(user: UserRegister):
+    """Register a new user"""
+    try:
+        users_collection = get_users_collection()
+        
+        # Verify CAPTCHA (in production)
+        # captcha_result = await verify_captcha(CaptchaVerify(token=user.captcha_token))
+        # if not captcha_result["success"]:
+        #     raise HTTPException(status_code=400, detail="CAPTCHA verification failed")
+        
+        # Check if user already exists
+        existing_user = await users_collection.find_one({"email": user.email})
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Create user
+        hashed_password = get_password_hash(user.password)
+        user_doc = {
+            "email": user.email,
+            "name": user.name,
+            "password": hashed_password,
+            "created_at": datetime.utcnow(),
+            "is_active": True
+        }
+        
+        result = await users_collection.insert_one(user_doc)
+        user_id = str(result.inserted_id)
+        
+        # Create access token
+        access_token = create_access_token(
+            data={"sub": user.email, "user_id": user_id}
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": user.email,
+                "name": user.name
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Registration failed: {str(e)}")
+
+@app.post("/api/auth/login")
+async def login(user: UserLogin):
+    """Login user"""
+    try:
+        users_collection = get_users_collection()
+        
+        # Verify CAPTCHA (in production)
+        # captcha_result = await verify_captcha(CaptchaVerify(token=user.captcha_token))
+        # if not captcha_result["success"]:
+        #     raise HTTPException(status_code=400, detail="CAPTCHA verification failed")
+        
+        # Find user
+        db_user = await users_collection.find_one({"email": user.email})
+        if not db_user:
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Verify password
+        if not verify_password(user.password, db_user["password"]):
+            raise HTTPException(status_code=401, detail="Invalid email or password")
+        
+        # Create access token
+        user_id = str(db_user["_id"])
+        access_token = create_access_token(
+            data={"sub": user.email, "user_id": user_id}
+        )
+        
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": db_user["email"],
+                "name": db_user["name"]
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Login failed: {str(e)}")
+
+@app.get("/api/auth/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """Get current user info"""
+    try:
+        users_collection = get_users_collection()
+        from bson.objectid import ObjectId
+        
+        db_user = await users_collection.find_one({"email": current_user["email"]})
+        if not db_user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        return {
+            "id": str(db_user["_id"]),
+            "email": db_user["email"],
+            "name": db_user["name"]
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get user: {str(e)}")
+
+# ==================== REVIEW HISTORY ENDPOINTS ====================
+
+@app.post("/api/history/save")
+async def save_review_history(
+    request: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """Save a code review to user's history"""
+    try:
+        db = database.client[os.getenv("DATABASE_NAME", "codecritic")]
+        history_collection = db.review_history
+        
+        history_item = {
+            "user_id": current_user["user_id"],
+            "timestamp": datetime.utcnow(),
+            "language": request.get("language"),
+            "code_snippet": request.get("code", "")[:200],  # Store first 200 chars
+            "full_code": request.get("code", ""),
+            "result": request.get("result"),
+        }
+        
+        result = await history_collection.insert_one(history_item)
+        
+        return {
+            "success": True,
+            "id": str(result.inserted_id)
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save history: {str(e)}")
+
+@app.get("/api/history")
+async def get_review_history(
+    limit: int = 50,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get user's review history"""
+    try:
+        db = database.client[os.getenv("DATABASE_NAME", "codecritic")]
+        history_collection = db.review_history
+        
+        cursor = history_collection.find(
+            {"user_id": current_user["user_id"]}
+        ).sort("timestamp", -1).limit(limit)
+        
+        history = []
+        async for item in cursor:
+            history.append({
+                "id": str(item["_id"]),
+                "timestamp": item["timestamp"].isoformat(),
+                "language": item.get("language"),
+                "codeSnippet": item.get("code_snippet", ""),
+                "result": item.get("result")
+            })
+        
+        return history
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get history: {str(e)}")
+
+@app.delete("/api/history/{history_id}")
+async def delete_review_history(
+    history_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a specific review from history"""
+    try:
+        db = database.client[os.getenv("DATABASE_NAME", "codecritic")]
+        history_collection = db.review_history
+        
+        result = await history_collection.delete_one({
+            "_id": ObjectId(history_id),
+            "user_id": current_user["user_id"]
+        })
+        
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="History item not found")
+        
+        return {"success": True}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete history: {str(e)}")
+
+@app.delete("/api/history")
+async def clear_review_history(current_user: dict = Depends(get_current_user)):
+    """Clear all review history for the user"""
+    try:
+        db = database.client[os.getenv("DATABASE_NAME", "codecritic")]
+        history_collection = db.review_history
+        
+        result = await history_collection.delete_many({
+            "user_id": current_user["user_id"]
+        })
+        
+        return {
+            "success": True,
+            "deleted_count": result.deleted_count
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to clear history: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

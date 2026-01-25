@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Code2, Sparkles, AlertCircle, Shield, Zap, RefreshCw, CheckCircle2, XCircle, History, BookOpen } from 'lucide-react';
+import { Code2, Sparkles, AlertCircle, Shield, Zap, RefreshCw, CheckCircle2, XCircle, History, BookOpen, LogOut } from 'lucide-react';
 import CodeEditor from '@/components/CodeEditor';
 import ReviewResults from '@/components/ReviewResults';
 import LoadingState from '@/components/LoadingState';
@@ -9,6 +9,9 @@ import ChatAssistant from '@/components/ChatAssistant';
 import CodeHistory from '@/components/CodeHistory';
 import SnippetLibrary from '@/components/SnippetLibrary';
 import Collaboration from '@/components/Collaboration';
+import Login from '@/components/Login';
+import Register from '@/components/Register';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface CodeReviewResult {
   overall_score: number;
@@ -58,12 +61,35 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export default function Home() {
+  const { user, logout, loading: authLoading } = useAuth();
+  const [showRegister, setShowRegister] = useState(false);
   const [code, setCode] = useState('');
   const [language, setLanguage] = useState('javascript');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CodeReviewResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show login/register if not authenticated
+  if (!user) {
+    return showRegister ? (
+      <Register onSwitchToLogin={() => setShowRegister(false)} />
+    ) : (
+      <Login onSwitchToRegister={() => setShowRegister(true)} />
+    );
+  }
 
   const handleReview = async () => {
     if (!code.trim()) {
@@ -77,6 +103,8 @@ export default function Home() {
 
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = localStorage.getItem('token');
+      
       const response = await fetch(`${apiUrl}/api/review`, {
         method: 'POST',
         headers: {
@@ -95,6 +123,27 @@ export default function Home() {
 
       const data = await response.json();
       setResult(data);
+      
+      // Save to history in database
+      if (token) {
+        try {
+          await fetch(`${apiUrl}/api/history/save`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              code,
+              language,
+              result: data
+            }),
+          });
+        } catch (historyError) {
+          console.error('Failed to save to history:', historyError);
+          // Don't show error to user, just log it
+        }
+      }
     } catch (err: any) {
       // Enhanced error handling for rate limits
       let errorMessage = err.message || 'Failed to review code. Please try again.';
@@ -119,15 +168,28 @@ export default function Home() {
       {/* Header */}
       <header className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-primary-600 rounded-lg">
                 <Code2 className="w-6 h-6 text-white" />
               </div>
-              <div className="text-center">
+              <div>
                 <h1 className="text-2xl font-extrabold text-white">CodeCritic AI</h1>
                 <p className="text-sm text-slate-400">Intelligent Code Analysis Powered by Pydantic AI</p>
               </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="text-right">
+                <p className="text-sm text-white font-medium">{user.name}</p>
+                <p className="text-xs text-slate-400">{user.email}</p>
+              </div>
+              <button
+                onClick={logout}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
             </div>
           </div>
         </div>
@@ -185,7 +247,7 @@ export default function Home() {
             <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={() => setShowHistory(!showHistory)}
-                className="flex items-center gap-2 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors"
               >
                 <History className="w-4 h-4" />
                 History
