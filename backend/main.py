@@ -329,8 +329,8 @@ async def register(user: UserRegister):
     try:
         users_collection = get_users_collection()
         
-        # Truncate password to 72 chars for bcrypt
-        password = user.password[:72]
+        # Truncate password to 72 bytes for bcrypt
+        password = user.password.encode('utf-8')[:72].decode('utf-8', errors='ignore')
         
         # Verify CAPTCHA (in production)
         # captcha_result = await verify_captcha(CaptchaVerify(token=user.captcha_token))
