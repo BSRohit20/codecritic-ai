@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { LogIn, Mail, Lock, Code2, Sparkles } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import ReCAPTCHA from 'react-google-recaptcha';
 
 interface LoginProps {
   onSwitchToRegister: () => void;
@@ -14,6 +15,7 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,11 +23,11 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
     setLoading(true);
 
     try {
-      // For now, using a dummy captcha token
-      // In production, integrate with Google reCAPTCHA
-      await login(email, password, 'dummy-captcha-token');
+      const captchaToken = recaptchaRef.current?.getValue() || 'dummy-captcha-token';
+      await login(email, password, captchaToken);
     } catch (err: any) {
       setError(err.message || 'Login failed');
+      recaptchaRef.current?.reset();
     } finally {
       setLoading(false);
     }
@@ -171,6 +173,15 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
                   {error}
                 </div>
               )}
+
+              {/* reCAPTCHA */}
+              <div className="flex justify-center">
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"}
+                  theme="dark"
+                />
+              </div>
 
               {/* Submit Button */}
               <button
