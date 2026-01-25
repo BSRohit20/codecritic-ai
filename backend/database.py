@@ -20,11 +20,8 @@ async def get_database():
 
 async def connect_to_mongo():
     """Connect to MongoDB on startup"""
-    database.client = AsyncIOMotorClient(
-        MONGODB_URL,
-        tls=True,
-        tlsAllowInvalidCertificates=False
-    )
+    # Let pymongo auto-detect SSL from mongodb+srv:// URI
+    database.client = AsyncIOMotorClient(MONGODB_URL)
     print(f"Connected to MongoDB at {MONGODB_URL}")
     
 async def close_mongo_connection():
