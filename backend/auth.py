@@ -17,17 +17,25 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
+def truncate_password(password: str, max_bytes: int = 72) -> str:
+    """Truncate password to max_bytes ensuring valid UTF-8"""
+    encoded = password.encode('utf-8')
+    if len(encoded) <= max_bytes:
+        return password
+    # Truncate and find valid UTF-8 boundary
+    truncated = encoded[:max_bytes]
+    # Decode with replace to handle incomplete characters
+    return truncated.decode('utf-8', errors='ignore')
+
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
-    # Truncate to 72 bytes for bcrypt compatibility
-    password_bytes = plain_password.encode('utf-8')[:72]
-    return pwd_context.verify(password_bytes.decode('utf-8', errors='ignore'), hashed_password)
+    password = truncate_password(plain_password)
+    return pwd_context.verify(password, hashed_password)
 
 def get_password_hash(password: str) -> str:
     """Hash a password"""
-    # Truncate to 72 bytes for bcrypt compatibility
-    password_bytes = password.encode('utf-8')[:72]
-    return pwd_context.hash(password_bytes.decode('utf-8', errors='ignore'))
+    password = truncate_password(password)
+    return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Create JWT access token"""
