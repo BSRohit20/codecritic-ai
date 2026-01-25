@@ -1,3 +1,4 @@
 {
-  "name": "codecritic-ai"
+  "buildCommand": "cd .. && cd frontend && npm run build",
+  "outputDirectory": ".next"
 }
