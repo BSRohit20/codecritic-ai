@@ -129,12 +129,12 @@ What would you like to know?`,
       {!isOpen && reviewResult && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 p-4 bg-primary-600 hover:bg-primary-500 text-white rounded-full shadow-lg transition-all hover:scale-110 z-50 group"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 p-3 sm:p-4 bg-primary-600 hover:bg-primary-500 text-white rounded-full shadow-lg transition-all hover:scale-110 z-50 group"
         >
-          <MessageCircle className="w-6 h-6" />
+          <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></span>
           <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block">
-            <div className="bg-slate-800 text-white text-sm px-3 py-2 rounded shadow-lg whitespace-nowrap">
+            <div className="bg-slate-800 text-white text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 rounded shadow-lg whitespace-nowrap">
               Ask questions about your review
             </div>
           </div>
@@ -143,36 +143,36 @@ What would you like to know?`,
 
       {/* Chat Window */}
       {isOpen && (
-        <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-slate-800 border border-slate-700 rounded-lg shadow-2xl flex flex-col z-50">
+        <div className="fixed inset-x-4 bottom-4 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-96 h-[calc(100vh-8rem)] sm:h-[600px] bg-slate-800 border border-slate-700 rounded-lg shadow-2xl flex flex-col z-50">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-primary-900/30 border-b border-slate-700">
+          <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 bg-primary-900/30 border-b border-slate-700">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary-400" />
-              <h3 className="font-semibold text-white">AI Assistant</h3>
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary-400" />
+              <h3 className="font-semibold text-white text-sm sm:text-base">AI Assistant</h3>
             </div>
             <button
               onClick={() => setIsOpen(false)}
               className="p-1 hover:bg-slate-700 rounded transition-colors"
             >
-              <X className="w-5 h-5 text-slate-400" />
+              <X className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400" />
             </button>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
             {messages.map((message) => (
               <div
                 key={message.id}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2 ${
+                  className={`max-w-[85%] sm:max-w-[80%] rounded-lg px-3 sm:px-4 py-2 ${
                     message.role === 'user'
                       ? 'bg-primary-600 text-white'
                       : 'bg-slate-700 text-slate-100'
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-xs sm:text-sm whitespace-pre-wrap break-words">{message.content}</p>
                   <span className="text-xs opacity-50 mt-1 block">
                     {message.timestamp.toLocaleTimeString()}
                   </span>
@@ -182,8 +182,8 @@ What would you like to know?`,
             
             {loading && (
               <div className="flex justify-start">
-                <div className="bg-slate-700 text-slate-100 rounded-lg px-4 py-2">
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                <div className="bg-slate-700 text-slate-100 rounded-lg px-3 sm:px-4 py-2">
+                  <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
                 </div>
               </div>
             )}
@@ -193,13 +193,13 @@ What would you like to know?`,
 
           {/* Suggested Questions */}
           {messages.length <= 1 && !loading && (
-            <div className="px-4 pb-2 space-y-2">
-              <p className="text-xs text-slate-400 mb-2">Suggested questions:</p>
+            <div className="px-3 sm:px-4 pb-2 space-y-1.5 sm:space-y-2">
+              <p className="text-xs text-slate-400 mb-1 sm:mb-2">Suggested questions:</p>
               {suggestedQuestions.map((question, idx) => (
                 <button
                   key={idx}
                   onClick={() => setInput(question)}
-                  className="w-full text-left text-xs px-3 py-2 bg-slate-700/50 hover:bg-slate-700 text-slate-300 rounded transition-colors"
+                  className="w-full text-left text-xs px-2.5 sm:px-3 py-1.5 sm:py-2 bg-slate-700/50 hover:bg-slate-700 text-slate-300 rounded transition-colors"
                 >
                   {question}
                 </button>
@@ -208,7 +208,7 @@ What would you like to know?`,
           )}
 
           {/* Input */}
-          <div className="p-4 border-t border-slate-700">
+          <div className="p-3 sm:p-4 border-t border-slate-700">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -216,15 +216,15 @@ What would you like to know?`,
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask about your code review..."
-                className="flex-1 px-4 py-2 bg-slate-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="flex-1 px-3 sm:px-4 py-2 bg-slate-700 text-white text-xs sm:text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 disabled={loading}
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || loading}
-                className="p-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
               >
-                <Send className="w-5 h-5" />
+                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>

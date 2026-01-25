@@ -16,6 +16,7 @@ An intelligent, full-stack AI-powered code review assistant built with Pydantic 
 - **Security Scanning**: Detect security vulnerabilities and get remediation advice
 - **Performance Tips**: Receive optimization suggestions to improve code efficiency
 - **Refactoring Guidance**: View side-by-side code comparisons for better implementations
+- **Complexity Analysis**: Automatic Big O notation analysis for time and space complexity
 
 ### 🎨 Premium User Experience
 - **Line Numbers**: Professional code editor with line numbering
@@ -24,6 +25,14 @@ An intelligent, full-stack AI-powered code review assistant built with Pydantic 
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
 - **Loading States**: Smooth animations while AI analyzes your code
 - **Multi-Language Support**: JavaScript, TypeScript, Python, Java, C++, Go, Rust, PHP, Ruby
+
+### 💡 Advanced Features
+- **📊 Code Diff Viewer**: Side-by-side comparison with syntax highlighting and one-click apply
+- **📈 Code History & Analytics**: Track review history, view trends, and export data as JSON/PDF
+- **💬 AI Chat Assistant**: Interactive chat about your code with context-aware responses
+- **📚 Snippet Library**: Save, organize, and reuse code patterns with search and tagging
+- **⚡ Performance Benchmarking**: Algorithm complexity analysis with optimization suggestions
+- **👥 Real-time Collaboration**: Share reviews, add comments, and collaborate with your team
 
 ### 🤖 Powered by Advanced AI
 - **Pydantic AI**: Structured, type-safe AI outputs
@@ -163,6 +172,8 @@ npm run dev
 codecritic-ai/
 ├── backend/
 │   ├── main.py              # FastAPI application with Pydantic AI agent
+│   ├── auth.py              # Authentication utilities
+│   ├── database.py          # Database configuration (MongoDB)
 │   ├── requirements.txt     # Python dependencies
 │   ├── .env                 # Environment variables (not in git)
 │   └── .gitignore          # Python/backend ignores
@@ -174,9 +185,19 @@ codecritic-ai/
 │   │   ├── globals.css      # Global styles
 │   │   └── favicon.ico      # App icon
 │   ├── components/
-│   │   ├── CodeEditor.tsx   # Code input with line numbers
-│   │   ├── ReviewResults.tsx # AI review display with copy buttons
-│   │   └── LoadingState.tsx  # Loading animation
+│   │   ├── CodeEditor.tsx           # Code input with line numbers
+│   │   ├── ReviewResults.tsx        # AI review display with copy buttons
+│   │   ├── LoadingState.tsx         # Loading animation
+│   │   ├── DiffViewer.tsx           # Side-by-side code comparison
+│   │   ├── CodeHistory.tsx          # Review history & analytics
+│   │   ├── ChatAssistant.tsx        # AI chat interface
+│   │   ├── SnippetLibrary.tsx       # Code snippet manager
+│   │   ├── PerformanceBenchmark.tsx # Complexity analysis display
+│   │   ├── Collaboration.tsx        # Sharing & comments
+│   │   ├── Login.tsx                # Login component
+│   │   └── Register.tsx             # Registration component
+│   ├── contexts/
+│   │   └── AuthContext.tsx          # Authentication context
 │   ├── package.json         # Node dependencies
 │   ├── tsconfig.json        # TypeScript configuration
 │   ├── tailwind.config.ts   # Tailwind CSS configuration
@@ -184,6 +205,7 @@ codecritic-ai/
 │   └── .gitignore          # Node/frontend ignores
 │
 ├── README.md               # This file
+├── NEW_FEATURES.md        # Detailed feature documentation
 ├── render.yaml            # Render deployment config
 └── .gitignore            # Root gitignore
 ```
@@ -199,9 +221,61 @@ codecritic-ai/
    - 💡 Code strengths
    - 🐛 Bugs with severity levels
    - 🔒 Security vulnerabilities
-   - ⚡ Performance optimizations
+   - ⚡ Performance optimizations & complexity analysis
    - 🔄 Refactoring suggestions (with side-by-side code comparison)
 6. **Copy Suggestions**: Use copy buttons to grab specific recommendations
+7. **Explore Advanced Features**:
+   - 📈 **View History**: Track your review history and analytics
+   - 💬 **Chat with AI**: Ask questions about your code review
+   - 📚 **Save Snippets**: Store frequently used code patterns
+   - 👥 **Collaborate**: Share reviews and add comments
+
+## 🚀 New Features
+
+### 📊 Code Diff Viewer
+View side-by-side comparisons of original vs. improved code with:
+- Color-coded highlighting (red for current, green for improved)
+- Line-by-line comparison
+- One-click copy to clipboard
+- One-click apply changes to editor
+
+### 📈 Code History & Analytics
+Track your code quality journey:
+- Stores up to 50 recent reviews in localStorage
+- Analytics dashboard with quality trends
+- Export history as JSON or PDF
+- Visual trend analysis (improving, declining, or stable)
+
+### 💬 AI Chat Assistant
+Interactive chat about your code:
+- Context-aware responses about your review
+- Suggested quick-start questions
+- Maintains conversation history
+- Floating, non-intrusive interface
+
+### 📚 Code Snippet Library
+Organize and reuse code patterns:
+- Save frequently reviewed code snippets
+- Tag-based organization
+- Search by title, description, or code
+- Usage tracking and favorites
+- Auto-suggestions based on current code
+
+### ⚡ Performance Benchmarking
+Algorithm complexity analysis:
+- Automatic Big O notation for time and space complexity
+- Color-coded complexity ratings (Excellent → Very Poor)
+- Detailed explanations and optimization suggestions
+- Complexity reference guide
+
+### 👥 Real-time Collaboration
+Share and collaborate on reviews:
+- Generate shareable links for code reviews
+- Email sharing integration
+- Line-specific comments
+- Team workspace (coming soon)
+
+For detailed feature documentation, see [NEW_FEATURES.md](NEW_FEATURES.md).
 
 ## 🔧 Key Technical Decisions
 
@@ -271,12 +345,17 @@ For hiring assessment submission, create 1-minute Loom video showing:
 ✅ **Type Safety**: Full TypeScript + Pydantic validation  
 
 ### Standout Features:
-1. **Side-by-Side Code Comparison**: Unique visual refactoring suggestions
+1. **Side-by-Side Code Comparison**: Unique visual refactoring suggestions with one-click apply
 2. **One-Click Copy**: Every suggestion has instant clipboard copy
 3. **Line Numbers in Editor**: Professional code editor experience
 4. **Intelligent Retries**: Handles API failures gracefully
 5. **Multi-Severity Ratings**: Critical/High/Medium/Low issue classification
 6. **Comprehensive Analysis**: Bugs, security, performance, refactoring in one view
+7. **Code History & Analytics**: Track quality trends and export detailed reports
+8. **AI Chat Assistant**: Context-aware chat about your code reviews
+9. **Snippet Library**: Organize and reuse code patterns with smart search
+10. **Performance Benchmarking**: Big O complexity analysis with optimization tips
+11. **Real-time Collaboration**: Share reviews and collaborate with comments
 
 ## 🐛 Troubleshooting
 
@@ -318,6 +397,17 @@ For hiring assessment submission, create 1-minute Loom video showing:
 **Type errors**
 - Ensure frontend interfaces match backend Pydantic models exactly
 - Check imports and paths
+
+**Chat not working**
+- Ensure backend is running and `/api/chat` endpoint is accessible
+- Check browser console for errors
+- Verify OPENROUTER_API_KEY is set in backend .env
+
+**History/Snippets not persisting**
+- Check browser localStorage is enabled
+- Verify you're not in incognito/private mode
+- Check browser storage quota
+- Clear browser cache if data seems corrupted
 
 ### Deployment Issues
 
@@ -370,9 +460,44 @@ Response:
   "bugs": [],
   "security_issues": [],
   "performance_tips": [],
-  "refactoring_suggestions": []
+  "refactoring_suggestions": [],
+  "complexity_analysis": {
+    "time_complexity": "O(1)",
+    "space_complexity": "O(1)",
+    "explanation": "Constant time and space",
+    "optimization_potential": "Already optimal"
+  }
 }
 ```
+
+**POST /api/chat**
+
+Request:
+```json
+{
+  "message": "How can I optimize this function?",
+  "code": "function example() { return 42; }",
+  "language": "javascript",
+  "review_context": {},
+  "chat_history": []
+}
+```
+
+Response:
+```json
+{
+  "response": "This function is already optimized with O(1) complexity..."
+}
+```
+
+## 💾 Local Storage
+
+The application uses browser localStorage for client-side persistence:
+- `codeReviewHistory` - Review history (max 50 items)
+- `codeSnippets` - Saved code snippets with tags
+- `reviewComments` - Collaboration comments
+
+**Note**: Data is stored locally in your browser. Clear cache or use incognito mode will reset this data.
 
 ## 🤝 Contributing
 

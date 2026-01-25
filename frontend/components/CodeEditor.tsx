@@ -33,7 +33,7 @@ export default function CodeEditor({ code, onChange, language }: CodeEditorProps
       {/* Line Numbers */}
       <div 
         ref={lineNumbersRef}
-        className="flex-shrink-0 bg-slate-800 py-4 px-3 text-slate-500 text-sm font-mono select-none border-r border-slate-700 overflow-hidden h-96"
+        className="flex-shrink-0 bg-slate-800 py-3 sm:py-4 px-2 sm:px-3 text-slate-500 text-xs sm:text-sm font-mono select-none border-r border-slate-700 overflow-hidden h-64 sm:h-80 md:h-96"
       >
         {lines.map((_, index) => (
           <div key={index} className="text-right" style={{ lineHeight: '1.5rem' }}>
@@ -47,7 +47,7 @@ export default function CodeEditor({ code, onChange, language }: CodeEditorProps
         ref={textareaRef}
         value={code}
         onChange={(e) => onChange(e.target.value)}
-        className="flex-1 h-96 p-4 bg-slate-900 text-slate-100 font-mono text-sm focus:outline-none resize-none"
+        className="flex-1 h-64 sm:h-80 md:h-96 p-3 sm:p-4 bg-slate-900 text-slate-100 font-mono text-xs sm:text-sm focus:outline-none resize-none"
         placeholder="Paste your code here..."
         spellCheck={false}
         style={{

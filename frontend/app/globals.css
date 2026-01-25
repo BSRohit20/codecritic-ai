@@ -35,6 +35,35 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  
+  /* Mobile optimizations */
+  @media (max-width: 640px) {
+    /* Improve touch targets */
+    button, a, input, select, textarea {
+      min-height: 44px;
+    }
+    
+    /* Prevent zoom on input focus */
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+    
+    /* Better scrolling */
+    * {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+  
+  /* Hide scrollbar on mobile for cleaner look */
+  @media (max-width: 768px) {
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  }
 }
 
 /* Custom scrollbar */

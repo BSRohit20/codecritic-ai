@@ -43,10 +43,10 @@ export default function Login({ onSwitchToRegister }: LoginProps) {
       </div>
 
       {/* Centered 2-Column Container */}
-      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
+      <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-12 items-center relative z-10">
         
       {/* Left Side - Branding */}
-      <div className="flex flex-col items-center justify-center p-8 xl:p-12">
+      <div className="hidden lg:flex flex-col items-center justify-center p-8 xl:p-12">
         
         {/* Logo and Tagline */}
         <div className="relative z-10 text-center max-w-xl">

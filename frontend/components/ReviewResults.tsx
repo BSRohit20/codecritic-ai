@@ -43,19 +43,19 @@ export default function ReviewResults({ result, onApplyCode, language = 'javascr
   };
 
   return (
-    <div className="space-y-6 animate-in">
+    <div className="space-y-4 sm:space-y-6 animate-in">
       {/* Overall Score */}
-      <div className="bg-slate-800/50 border-2 border-slate-700 rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-slate-800/50 border-2 border-slate-700 rounded-lg p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-blue-400" />
-            <h2 className="text-xl font-semibold text-white">Overall Score</h2>
+            <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Overall Score</h2>
           </div>
-          <div className={`text-4xl font-bold ${getScoreColor(result.overall_score)}`}>
+          <div className={`text-2xl sm:text-4xl font-bold ${getScoreColor(result.overall_score)}`}>
             {result.overall_score}/100
           </div>
         </div>
-        <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+        <div className="w-full bg-slate-700 rounded-full h-2 sm:h-3 overflow-hidden">
           <div
             className={`h-full transition-all duration-500 ${
               result.overall_score >= 80
@@ -71,31 +71,31 @@ export default function ReviewResults({ result, onApplyCode, language = 'javascr
 
       {/* Bugs Section */}
       {result.bugs && result.bugs.length > 0 && (
-        <div className="bg-slate-800/50 border-2 border-slate-700 rounded-lg p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <h2 className="text-xl font-semibold text-white">Bugs Found</h2>
-            <span className="bg-red-900/30 text-red-400 px-2 py-1 rounded text-sm font-medium">
+        <div className="bg-slate-800/50 border-2 border-slate-700 rounded-lg p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4 flex-wrap">
+            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" />
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Bugs Found</h2>
+            <span className="bg-red-900/30 text-red-400 px-2 py-1 rounded text-xs sm:text-sm font-medium">
               {result.bugs.length}
             </span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {result.bugs.map((bug, index) => (
               <div
                 key={index}
-                className={`border-l-4 p-4 rounded-r ${getSeverityColor(bug.severity)}`}
+                className={`border-l-4 p-3 sm:p-4 rounded-r ${getSeverityColor(bug.severity)}`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-xs font-semibold uppercase tracking-wide">
                         {bug.severity || 'N/A'}
                       </span>
                       <span className="text-slate-400 text-xs">Line {bug.line || 'N/A'}</span>
                     </div>
-                    <p className="text-white mb-2">{bug.description || 'No description provided'}</p>
+                    <p className="text-white mb-2 text-sm sm:text-base break-words">{bug.description || 'No description provided'}</p>
                     {bug.suggestion && (
-                      <div className="bg-slate-900/50 rounded p-2 text-sm font-mono text-slate-300">
+                      <div className="bg-slate-900/50 rounded p-2 text-xs sm:text-sm font-mono text-slate-300 overflow-x-auto">
                         {bug.suggestion}
                       </div>
                     )}
@@ -103,13 +103,13 @@ export default function ReviewResults({ result, onApplyCode, language = 'javascr
                   {bug.suggestion && (
                     <button
                       onClick={() => copyToClipboard(bug.suggestion, `bug-${index}`)}
-                      className="p-2 hover:bg-slate-700 rounded transition-colors"
+                      className="p-2 hover:bg-slate-700 rounded transition-colors flex-shrink-0"
                       title="Copy suggestion"
                     >
                       {copiedId === `bug-${index}` ? (
-                        <Check className="w-4 h-4 text-green-400" />
+                        <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
                       ) : (
-                        <Copy className="w-4 h-4 text-slate-400" />
+                        <Copy className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400" />
                       )}
                     </button>
                   )}
@@ -122,31 +122,31 @@ export default function ReviewResults({ result, onApplyCode, language = 'javascr
 
       {/* Security Issues Section */}
       {result.security_issues && result.security_issues.length > 0 && (
-        <div className="bg-slate-800/50 border-2 border-slate-700 rounded-lg p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Shield className="w-5 h-5 text-yellow-400" />
-            <h2 className="text-xl font-semibold text-white">Security Issues</h2>
-            <span className="bg-yellow-900/30 text-yellow-400 px-2 py-1 rounded text-sm font-medium">
+        <div className="bg-slate-800/50 border-2 border-slate-700 rounded-lg p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4 flex-wrap">
+            <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-400" />
+            <h2 className="text-lg sm:text-xl font-semibold text-white">Security Issues</h2>
+            <span className="bg-yellow-900/30 text-yellow-400 px-2 py-1 rounded text-xs sm:text-sm font-medium">
               {result.security_issues.length}
             </span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {result.security_issues.map((issue, index) => (
               <div
                 key={index}
-                className={`border-l-4 p-4 rounded-r ${getSeverityColor(issue.severity)}`}
+                className={`border-l-4 p-3 sm:p-4 rounded-r ${getSeverityColor(issue.severity)}`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <span className="text-xs font-semibold uppercase tracking-wide">
                         {issue.severity || 'N/A'}
                       </span>
                       <span className="text-slate-400 text-xs">Line {issue.line || 'N/A'}</span>
                     </div>
-                    <p className="text-white mb-2">{issue.description || 'No description provided'}</p>
+                    <p className="text-white mb-2 text-sm sm:text-base break-words">{issue.description || 'No description provided'}</p>
                     {issue.recommendation && (
-                      <div className="bg-slate-900/50 rounded p-2 text-sm font-mono text-slate-300">
+                      <div className="bg-slate-900/50 rounded p-2 text-xs sm:text-sm font-mono text-slate-300 overflow-x-auto">
                         {issue.recommendation}
                       </div>
                     )}
