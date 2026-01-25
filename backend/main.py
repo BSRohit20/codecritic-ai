@@ -15,7 +15,7 @@ from bson.objectid import ObjectId
 
 load_dotenv()
 
-app = FastAPI(title="AI Code Review Assistant", version="1.0.0")
+app = FastAPI(title="AI Code Review Assistant", version="1.0.1")
 
 # Lifecycle events
 @app.on_event("startup")
