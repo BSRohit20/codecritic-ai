@@ -329,6 +329,9 @@ async def register(user: UserRegister):
     try:
         users_collection = get_users_collection()
         
+        # Truncate password to 72 chars for bcrypt
+        password = user.password[:72]
+        
         # Verify CAPTCHA (in production)
         # captcha_result = await verify_captcha(CaptchaVerify(token=user.captcha_token))
         # if not captcha_result["success"]:
@@ -340,7 +343,7 @@ async def register(user: UserRegister):
             raise HTTPException(status_code=400, detail="Email already registered")
         
         # Create user
-        hashed_password = get_password_hash(user.password)
+        hashed_password = get_password_hash(password)
         user_doc = {
             "email": user.email,
             "name": user.name,
