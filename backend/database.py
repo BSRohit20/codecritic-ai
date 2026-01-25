@@ -20,7 +20,11 @@ async def get_database():
 
 async def connect_to_mongo():
     """Connect to MongoDB on startup"""
-    database.client = AsyncIOMotorClient(MONGODB_URL)
+    database.client = AsyncIOMotorClient(
+        MONGODB_URL,
+        tls=True,
+        tlsAllowInvalidCertificates=False
+    )
     print(f"Connected to MongoDB at {MONGODB_URL}")
     
 async def close_mongo_connection():

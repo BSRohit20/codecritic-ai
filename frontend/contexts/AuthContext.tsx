@@ -73,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await response.json();
     localStorage.setItem('token', data.access_token);
     setUser(data.user);
+    setLoading(false);
   };
 
   const register = async (email: string, password: string, name: string, captchaToken: string) => {
@@ -93,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await response.json();
     localStorage.setItem('token', data.access_token);
     setUser(data.user);
+    setLoading(false);
   };
 
   const logout = () => {
