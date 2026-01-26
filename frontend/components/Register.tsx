@@ -160,7 +160,7 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 bg-slate-950 border border-blue-500/30 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="John Doe"
+                  placeholder="Your full name"
                 />
               </div>
             </div>
