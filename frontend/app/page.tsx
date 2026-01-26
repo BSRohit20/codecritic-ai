@@ -117,6 +117,49 @@ export default function Home() {
     );
   }
 
+  // Show verification required page if email not verified
+  if (user && !user.email_verified) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-2xl p-8 text-center">
+          <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-10 h-10 text-yellow-500" />
+          </div>
+          
+          <h1 className="text-2xl font-bold text-white mb-3">
+            Verify Your Email
+          </h1>
+          
+          <p className="text-slate-300 mb-6">
+            We've sent a verification email to <strong className="text-white">{user.email}</strong>. 
+            Please check your inbox and click the verification link to access CodeCritic AI.
+          </p>
+          
+          <div className="space-y-3">
+            <button
+              onClick={handleResendVerification}
+              disabled={resendingEmail || emailResent}
+              className="w-full px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {emailResent ? '✓ Email Sent! Check Your Inbox' : resendingEmail ? 'Sending...' : 'Resend Verification Email'}
+            </button>
+            
+            <button
+              onClick={logout}
+              className="w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors"
+            >
+              Logout
+            </button>
+          </div>
+          
+          <p className="text-sm text-slate-400 mt-6">
+            Didn't receive the email? Check your spam folder or click resend above.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const handleReview = async () => {
     if (!code.trim()) {
       setError('Please enter some code to review');
@@ -191,29 +234,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Email Verification Banner */}
-      {user && !user.email_verified && (
-        <div className="bg-yellow-500/10 border-b border-yellow-500/20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex items-center justify-between flex-wrap gap-3">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-yellow-500" />
-                <span className="text-yellow-200">
-                  Please verify your email to access all features. Check your inbox for the verification link.
-                </span>
-              </div>
-              <button
-                onClick={handleResendVerification}
-                disabled={resendingEmail || emailResent}
-                className="px-4 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-              >
-                {emailResent ? '✓ Email Sent' : resendingEmail ? 'Sending...' : 'Resend Email'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      
       {/* Header */}
       <header className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
