@@ -57,7 +57,9 @@ async def send_verification_email(email: str, token: str):
         
         # Only send email if API key is configured
         if resend.api_key and resend.api_key != "":
+            print(f"📧 Sending verification email to {email} with Resend API...")
             email_result = resend.Emails.send(params)
+            print(f"✅ Email sent successfully! ID: {email_result.get('id')}")
             return {"success": True, "id": email_result.get("id")}
         else:
             # In development without API key, just log the link
@@ -65,7 +67,10 @@ async def send_verification_email(email: str, token: str):
             return {"success": True, "dev_mode": True, "link": verification_link}
             
     except Exception as e:
-        print(f"Error sending verification email: {str(e)}")
+        print(f"❌ Error sending verification email to {email}: {str(e)}")
+        print(f"Error details: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
         return {"success": False, "error": str(e)}
 
 async def send_welcome_email(email: str, name: str):

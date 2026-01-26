@@ -366,6 +366,9 @@ async def register(user: UserRegister):
         # Send verification email
         email_result = await send_verification_email(user.email, verification_token)
         
+        # Log email result for debugging
+        print(f"📧 Verification email result for {user.email}: {email_result}")
+        
         # Create access token (user can use app but some features may be limited)
         access_token = create_access_token(
             data={"sub": user.email, "user_id": user_id}
