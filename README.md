@@ -1,6 +1,6 @@
 # CodeCritic AI 🚀
 
-An intelligent, full-stack AI-powered code review assistant built with Pydantic AI and modern web technologies. Get instant, comprehensive feedback on code quality, security vulnerabilities, performance issues, and refactoring opportunities.
+A production-ready, full-stack AI-powered code review platform with user authentication, email verification, and comprehensive code analysis. Built with Pydantic AI, FastAPI, Next.js, and MongoDB.
 
 ## 🌐 Live Demo
 
@@ -10,67 +10,73 @@ An intelligent, full-stack AI-powered code review assistant built with Pydantic 
 
 ## ✨ Key Features
 
+### 🔐 Authentication & Security
+- **User Registration & Login**: Secure JWT-based authentication
+- **Email Verification**: Brevo-powered email verification with resend functionality
+- **Password Hashing**: Bcrypt encryption for secure password storage
+- **Protected Routes**: Role-based access control
+- **Session Management**: Persistent login with token refresh
+
 ### 🎯 Comprehensive Code Analysis
-- **Quality Scoring**: Get an overall code quality score (0-100)
-- **Bug Detection**: Identify potential bugs with severity ratings (critical, high, medium, low)
-- **Security Scanning**: Detect security vulnerabilities and get remediation advice
-- **Performance Tips**: Receive optimization suggestions to improve code efficiency
-- **Refactoring Guidance**: View side-by-side code comparisons for better implementations
-- **Complexity Analysis**: Automatic Big O notation analysis for time and space complexity
+- **Quality Scoring**: Overall code quality score (0-100)
+- **Bug Detection**: Identify bugs with severity ratings (critical, high, medium, low)
+- **Security Scanning**: Detect vulnerabilities (SQL injection, XSS, auth flaws, etc.)
+- **Performance Tips**: Optimization suggestions for better efficiency
+- **Refactoring Guidance**: Side-by-side code comparisons with improvements
+- **Complexity Analysis**: Automatic Big O notation for time and space complexity
 
 ### 🎨 Premium User Experience
-- **Line Numbers**: Professional code editor with line numbering
-- **One-Click Copy**: Copy suggestions directly to clipboard with visual feedback
-- **Side-by-Side Comparison**: View current vs. improved code for refactoring suggestions
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **Loading States**: Smooth animations while AI analyzes your code
+- **Modern UI/UX**: Gradient backgrounds, smooth animations, responsive design
+- **Code Diff Viewer**: Side-by-side comparison with syntax highlighting
+- **One-Click Copy**: Copy suggestions directly to clipboard
+- **Real-time Feedback**: Loading states and progress indicators
 - **Multi-Language Support**: JavaScript, TypeScript, Python, Java, C++, Go, Rust, PHP, Ruby
+- **Mobile Responsive**: Works seamlessly on all devices
 
 ### 💡 Advanced Features
-- **📊 Code Diff Viewer**: Side-by-side comparison with syntax highlighting and one-click apply
-- **📈 Code History & Analytics**: Track review history, view trends, and export data as JSON/PDF
-- **💬 AI Chat Assistant**: Interactive chat about your code with context-aware responses
-- **📚 Snippet Library**: Save, organize, and reuse code patterns with search and tagging
-- **⚡ Performance Benchmarking**: Algorithm complexity analysis with optimization suggestions
-- **👥 Real-time Collaboration**: Share reviews, add comments, and collaborate with your team
+- **📊 Code History**: Track all reviews with timestamps and filtering
+- **💬 AI Chat Assistant**: Interactive chat about your code
+- **📚 Snippet Library**: Save and organize reusable code patterns
+- **⚡ Performance Benchmarking**: Algorithm complexity analysis
+- **👥 Real-time Collaboration**: Share reviews and collaborate
+- **📈 Analytics Dashboard**: View trends and export data (JSON/PDF)
 
-### 🤖 Powered by Advanced AI
+### 🤖 AI-Powered by Mistral
 - **Pydantic AI**: Structured, type-safe AI outputs
-- **Mistral Devstral 2512**: Free, powerful AI model optimized for code via OpenRouter
+- **Mistral Devstral 2512**: Free, code-optimized AI model via OpenRouter
 - **Intelligent Retries**: Automatic retry logic for reliability
-- **Detailed Error Handling**: Clear feedback when issues occur
-
-### ⚠️ Important: Rate Limits
-- **Free Tier**: 50 requests per day (resets every 24 hours)
-- **Paid Tier**: Add 10 credits (~$10) for 1,000 requests per day
-- **Upgrade**: Visit [OpenRouter Credits](https://openrouter.ai/credits) to add credits
+- **Context-Aware**: Maintains conversation context for better suggestions
 
 ## 🏗️ Tech Stack
 
 ### Backend
-- **FastAPI 0.115.0**: High-performance async Python web framework
+- **FastAPI 0.115.0**: High-performance async Python framework
 - **Pydantic AI 0.0.14**: Type-safe AI agent with structured outputs
-- **OpenRouter API**: Access to Mistral Devstral 2512 (free tier, code-optimized)
-- **Python 3.13.4**: Latest Python with improved performance
-- **Uvicorn**: Lightning-fast ASGI server
+- **MongoDB**: NoSQL database for user data and review history
+- **Brevo API**: Transactional email service (300 emails/day free)
+- **JWT Authentication**: Secure token-based auth
+- **Python 3.13.4**: Latest Python with performance improvements
 
 ### Frontend
-- **Next.js 15.5.9**: React framework with App Router and server components
-- **React 18.3.1**: Modern React with concurrent features
-- **TypeScript**: Full type safety across the application
-- **Tailwind CSS 3.4.0**: Utility-first CSS framework
-- **Lucide React**: Beautiful, consistent icon library
+- **Next.js 15.5.9**: React framework with App Router
+- **React 18.3.1**: Modern React with hooks and context
+- **TypeScript**: Full type safety
+- **Tailwind CSS 3.4.0**: Utility-first styling
+- **Lucide React**: Beautiful icon library
 
-### Deployment & DevOps
-- **Vercel**: Frontend hosting with automatic deployments
-- **Render**: Backend hosting with auto-deploy from GitHub
-- **Git & GitHub**: Version control and CI/CD
+### Infrastructure
+- **Vercel**: Frontend hosting with edge network
+- **Render**: Backend hosting with auto-deploy
+- **MongoDB Atlas**: Cloud database
+- **GitHub Actions**: CI/CD pipeline
 
 ## 📋 Prerequisites
 
 - Python 3.10+ (3.13.4 recommended)
-- Node.js 18+ 
+- Node.js 18+
+- MongoDB account (free at [mongodb.com](https://mongodb.com))
 - OpenRouter API key (free at [openrouter.ai](https://openrouter.ai))
+- Brevo account (free at [brevo.com](https://brevo.com))
 
 ## 🚀 Local Development Setup
 
@@ -87,7 +93,7 @@ cd codecritic-ai
 # Navigate to backend directory
 cd backend
 
-# Create virtual environment (recommended)
+# Create virtual environment
 python -m venv venv
 
 # Activate virtual environment
@@ -99,16 +105,20 @@ source venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Create .env file with your API key
+# Create .env file with required variables
 echo OPENROUTER_API_KEY=your_key_here > .env
+echo MONGODB_URL=your_mongodb_connection_string >> .env
+echo JWT_SECRET_KEY=your_secret_key >> .env
+echo BREVO_API_KEY=your_brevo_api_key >> .env
+echo FROM_EMAIL=your_verified_email@domain.com >> .env
+echo FRONTEND_URL=http://localhost:3000 >> .env
 ```
 
-**Get your free OpenRouter API key:**
-1. Visit [openrouter.ai](https://openrouter.ai)
-2. Sign up (free)
-3. Go to Keys section
-4. Create new API key
-5. Copy to `.env` file
+**Required API Keys:**
+1. **OpenRouter** (AI): Visit [openrouter.ai](https://openrouter.ai) → Sign up → Keys → Create
+2. **MongoDB** (Database): Visit [mongodb.com](https://mongodb.com) → Create free cluster → Connect → Get connection string
+3. **Brevo** (Email): Visit [brevo.com](https://brevo.com) → Sign up → SMTP & API → Generate API key → Verify sender email
+4. **JWT Secret**: Generate a random string (e.g., `openssl rand -hex 32`)
 
 ### 3. Frontend Setup
 
@@ -152,7 +162,15 @@ npm run dev
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `uvicorn main:app --host 0.0.0.0 --port $PORT`
 4. **Add Environment Variables**:
-   - `OPENROUTER_API_KEY`: Your OpenRouter API key
+   ```
+   OPENROUTER_API_KEY=your_openrouter_key
+   MONGODB_URL=your_mongodb_connection_string
+   DATABASE_NAME=codecritic
+   JWT_SECRET_KEY=your_secret_key
+   BREVO_API_KEY=your_brevo_api_key
+   FROM_EMAIL=your_verified_email@domain.com
+   FRONTEND_URL=https://your-frontend-url.vercel.app
+   ```
 5. **Deploy** (auto-deploys on git push)
 
 ### Frontend Deployment (Vercel)
@@ -171,27 +189,35 @@ npm run dev
 ```
 codecritic-ai/
 ├── backend/
-│   ├── main.py              # FastAPI application with Pydantic AI agent
-│   ├── auth.py              # Authentication utilities
-│   ├── database.py          # Database configuration (MongoDB)
-│   ├── requirements.txt     # Python dependencies
-│   ├── .env                 # Environment variables (not in git)
-│   └── .gitignore          # Python/backend ignores
+│   ├── main.py                      # FastAPI app with Pydantic AI
+│   ├── auth.py                      # JWT authentication & password hashing
+│   ├── database.py                  # MongoDB connection & operations
+│   ├── email_service_brevo.py       # Brevo email service
+│   ├── requirements.txt             # Python dependencies
+│   ├── .env                         # Environment variables (not in git)
+│   └── test_*.py                    # Test files
 │
 ├── frontend/
 │   ├── app/
-│   │   ├── page.tsx         # Main application page
-│   │   ├── layout.tsx       # Root layout with metadata
-│   │   ├── globals.css      # Global styles
-│   │   └── favicon.ico      # App icon
+│   │   ├── page.tsx                 # Main app with verification wall
+│   │   ├── layout.tsx               # Root layout
+│   │   ├── globals.css              # Global styles
+│   │   └── verify-email/
+│   │       └── page.tsx             # Email verification page
 │   ├── components/
-│   │   ├── CodeEditor.tsx           # Code input with line numbers
-│   │   ├── ReviewResults.tsx        # AI review display with copy buttons
+│   │   ├── Login.tsx                # Login form
+│   │   ├── Register.tsx             # Registration form
+│   │   ├── CodeEditor.tsx           # Code input
+│   │   ├── ReviewResults.tsx        # Review display
 │   │   ├── LoadingState.tsx         # Loading animation
-│   │   ├── DiffViewer.tsx           # Side-by-side code comparison
-│   │   ├── CodeHistory.tsx          # Review history & analytics
-│   │   ├── ChatAssistant.tsx        # AI chat interface
-│   │   ├── SnippetLibrary.tsx       # Code snippet manager
+│   │   ├── DiffViewer.tsx           # Code comparison
+│   │   ├── CodeHistory.tsx          # Review history
+│   │   ├── ChatAssistant.tsx        # AI chat
+│   │   ├── SnippetLibrary.tsx       # Code snippets
+│   │   ├── Collaboration.tsx        # Team features
+│   │   └── PerformanceBenchmark.tsx # Performance tools
+│   ├── contexts/
+│   │   └── AuthContext.tsx          # Auth state management
 │   │   ├── PerformanceBenchmark.tsx # Complexity analysis display
 │   │   ├── Collaboration.tsx        # Sharing & comments
 │   │   ├── Login.tsx                # Login component
@@ -212,23 +238,37 @@ codecritic-ai/
 
 ## 🎯 How to Use
 
-1. **Open the App**: Visit [codecritic-ai.vercel.app](https://codecritic-ai.vercel.app)
-2. **Paste Your Code**: Copy code you want reviewed into the editor
-3. **Select Language**: Choose from 9 supported languages
-4. **Click "Review Code"**: Wait 10-30 seconds for AI analysis
-5. **View Results**: See comprehensive feedback with:
-   - ✅ Overall quality score
-   - 💡 Code strengths
-   - 🐛 Bugs with severity levels
-   - 🔒 Security vulnerabilities
-   - ⚡ Performance optimizations & complexity analysis
-   - 🔄 Refactoring suggestions (with side-by-side code comparison)
-6. **Copy Suggestions**: Use copy buttons to grab specific recommendations
-7. **Explore Advanced Features**:
-   - 📈 **View History**: Track your review history and analytics
-   - 💬 **Chat with AI**: Ask questions about your code review
-   - 📚 **Save Snippets**: Store frequently used code patterns
-   - 👥 **Collaborate**: Share reviews and add comments
+### For End Users
+
+1. **Register an Account**: 
+   - Visit [codecritic-ai.vercel.app](https://codecritic-ai.vercel.app)
+   - Click "Create Account"
+   - Enter your email, name, and password
+   - Verify your email (check inbox/spam)
+
+2. **Login & Start Reviewing**:
+   - After email verification, you can access the app
+   - Paste your code into the editor
+   - Select programming language
+   - Click "Review Code"
+
+3. **View Comprehensive Results**:
+   - ✅ Overall quality score (0-100)
+   - 💡 Code strengths and best practices
+   - 🐛 Bugs with line numbers and severity
+   - 🔒 Security vulnerabilities with fixes
+   - ⚡ Performance tips and complexity analysis
+   - 🔄 Refactoring suggestions with code comparisons
+
+4. **Use Advanced Features**:
+   - 📈 **View History**: Track all your reviews
+   - 💬 **AI Chat**: Ask questions about your code
+   - 📚 **Snippets**: Save reusable code patterns
+   - 👥 **Share**: Collaborate with teammates
+
+### For Developers
+
+See the [Development Setup](#-local-development-setup) section above.
 
 ## 🚀 New Features
 
@@ -275,32 +315,125 @@ Share and collaborate on reviews:
 - Line-specific comments
 - Team workspace (coming soon)
 
-For detailed feature documentation, see [NEW_FEATURES.md](NEW_FEATURES.md).
+## 📚 API Documentation
+
+### Authentication Endpoints
+
+#### POST `/api/auth/register`
+Register a new user account
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123",
+  "name": "John Doe"
+}
+```
+Response: `{ "access_token", "user": {...}, "message" }`
+
+#### POST `/api/auth/login`
+Login with email and password
+```json
+{
+  "email": "user@example.com",
+  "password": "securePassword123"
+}
+```
+Response: `{ "access_token", "user": {...} }`
+
+#### GET `/api/auth/me`
+Get current user info (requires authentication)
+Headers: `Authorization: Bearer <token>`
+
+#### GET `/api/auth/verify-email?token=<token>`
+Verify email address with token from email
+
+#### POST `/api/auth/resend-verification`
+Resend verification email (requires authentication)
+
+### Code Review Endpoints
+
+#### POST `/api/review`
+Submit code for AI review
+```json
+{
+  "code": "function example() { ... }",
+  "language": "javascript"
+}
+```
+Response: Complete code review with bugs, security, performance, etc.
+
+#### POST `/api/history/save`
+Save review to history (requires authentication)
+
+#### GET `/api/history`
+Get user's review history (requires authentication)
+
+### Health Check
+
+#### GET `/health`
+Check service status and configuration
+Response: Shows if API keys and services are configured
+
+For detailed API documentation, see the [API Reference](#) or visit `/docs` on the backend URL.
 
 ## 🔧 Key Technical Decisions
 
-### Why Llama 3.3 70B?
-- **Function Calling Support**: Required for Pydantic AI structured outputs
-- **Free Tier**: Cost-effective for demonstration
-- **Quality**: 70B parameters provide detailed, accurate reviews
-- **Reliability**: Tested multiple models; this one had best success rate
+### Email Service (Brevo)
+- **Why Brevo**: SMTP ports (587, 465) are blocked on Render
+- **HTTP API**: Uses REST API instead of SMTP
+- **Free Tier**: 300 emails/day - sufficient for the app
+- **No Domain Required**: Can send from verified email addresses
+
+### Authentication (JWT)
+- **Stateless**: No server-side session storage needed
+- **Scalable**: Works across multiple server instances
+- **Secure**: Bcrypt password hashing + token expiration
+
+### Database (MongoDB)
+- **Flexible Schema**: Easy to add features without migrations
+- **Cloud-Native**: MongoDB Atlas with auto-scaling
+- **Performance**: Fast queries for user data and history
+
+### Why Mistral Devstral 2512?
+- **Free Tier**: Cost-effective for users
+- **Code-Optimized**: Specifically trained for code analysis
+- **Function Calling**: Required for Pydantic AI structured outputs
+- **Reliability**: Better success rate than other free models
 
 ### Why Pydantic AI?
-- **Type Safety**: Structured outputs guarantee consistent response format
+- **Type Safety**: Structured outputs guarantee consistent responses
 - **Validation**: Automatic data validation prevents runtime errors
-- **Developer Experience**: Clear, typed interfaces for AI responses
+- **Developer Experience**: Clear, typed interfaces
 - **Framework Agnostic**: Works with any Python backend
 
-### Architecture Highlights
-- **Separation of Concerns**: Clear backend/frontend split
-- **Type Safety**: TypeScript frontend + Pydantic backend
-- **Error Handling**: Retry logic, timeouts, clear error messages
-- **User Experience**: Loading states, copy buttons, responsive design
-- **Production Ready**: CORS configured, environment variables, deployment configs
+## 🔐 Security Features
+
+- ✅ **Password Hashing**: Bcrypt with salt
+- ✅ **JWT Tokens**: Secure authentication
+- ✅ **Email Verification**: Required before app access
+- ✅ **CORS**: Properly configured for production
+- ✅ **Environment Variables**: Sensitive data not in code
+- ✅ **Input Validation**: Pydantic models validate all inputs
+- ✅ **Rate Limiting**: Protected against abuse (via OpenRouter)
+
+## ⚠️ Rate Limits & Quotas
+
+### OpenRouter (AI)
+- **Free Tier**: 50 requests/day
+- **Paid**: $10 for ~1,000 requests
+- **Upgrade**: [openrouter.ai/credits](https://openrouter.ai/credits)
+
+### Brevo (Email)
+- **Free Tier**: 300 emails/day
+- **More than enough** for typical usage
+
+### MongoDB Atlas
+- **Free Tier**: 512MB storage
+- **Sufficient** for thousands of users
 
 ## 🧪 Testing the Application
 
-### Sample Code to Try:
+### Sample Code to Try
 
 **JavaScript (with intentional issues):**
 ```javascript
@@ -323,159 +456,106 @@ for (var i = 0; i < 10000; i++) {
 - Performance: Inefficient array building
 - Refactoring: Use const/let, Array.from()
 
-## 🎥 Demo Video
-
-For hiring assessment submission, create 1-minute Loom video showing:
-1. ✅ Your face visible (required)
-2. 🖥️ Live demo of deployed app
-3. 📝 Paste code → Submit → View results
-4. 💬 Brief tech stack mention
-5. ✨ Highlight unique feature (e.g., side-by-side comparison)
-
-## � Unique Features & Selling Points
-
-### For Hiring Assessment:
-✅ **Full-Stack Mastery**: Complete end-to-end implementation  
-✅ **Modern Tech Stack**: Latest Next.js 15, FastAPI, Pydantic AI  
-✅ **Production-Grade**: Deployed, live, and functional  
-✅ **Excellent UX**: Line numbers, copy buttons, side-by-side comparisons  
-✅ **Real Problem Solved**: Addresses actual developer pain points  
-✅ **Clean Architecture**: Modular, maintainable, scalable code  
-✅ **Error Resilience**: Retry logic, timeout handling, clear error messages  
-✅ **Type Safety**: Full TypeScript + Pydantic validation  
-
-### Standout Features:
-1. **Side-by-Side Code Comparison**: Unique visual refactoring suggestions with one-click apply
-2. **One-Click Copy**: Every suggestion has instant clipboard copy
-3. **Line Numbers in Editor**: Professional code editor experience
-4. **Intelligent Retries**: Handles API failures gracefully
-5. **Multi-Severity Ratings**: Critical/High/Medium/Low issue classification
-6. **Comprehensive Analysis**: Bugs, security, performance, refactoring in one view
-7. **Code History & Analytics**: Track quality trends and export detailed reports
-8. **AI Chat Assistant**: Context-aware chat about your code reviews
-9. **Snippet Library**: Organize and reuse code patterns with smart search
-10. **Performance Benchmarking**: Big O complexity analysis with optimization tips
-11. **Real-time Collaboration**: Share reviews and collaborate with comments
-
 ## 🐛 Troubleshooting
 
 ### Backend Issues
 
-**"Rate limit exceeded" errors**
-- **Cause**: Free tier limited to 50 requests per day
-- **Solutions**:
-  1. Wait for rate limit to reset (24 hours from first request)
-  2. Add 10 credits to your OpenRouter account for 1,000 requests/day
-  3. Use a different OpenRouter account temporarily
-- **Check limit reset time**: Look at error message for reset timestamp
-- **Upgrade**: Visit [openrouter.ai/credits](https://openrouter.ai/credits)
+**"Email not sending"**
+- Verify `BREVO_API_KEY` is set correctly
+- Check `FROM_EMAIL` is verified in Brevo dashboard
+- Check Render logs for detailed error messages
+- Ensure SMTP ports aren't blocked (use Brevo HTTP API)
 
-**"ModuleNotFoundError: No module named '_griffe'"**
-- Solution: Pin griffe to version 1.5.0 (already in requirements.txt)
-- Run: `pip install griffe==1.5.0`
+**"Rate limit exceeded"**
+- **Cause**: Free tier limited to 50 requests/day
+- **Solution**: Wait 24 hours or upgrade at [openrouter.ai/credits](https://openrouter.ai/credits)
 
-**"Empty model response" errors**
-- Cause: Free model rate limits or overload
-- Solution: Retry after a few seconds (automatic retry logic included)
-- Alternative: Consider upgrading to paid model if persistent
+**"MongoDB connection failed"**
+- Verify `MONGODB_URL` is correct
+- Whitelist your IP in MongoDB Atlas
+- Check network access settings
 
 **Port already in use**
-- Check: `netstat -ano | findstr :8000` (Windows)
-- Kill process or use different port in main.py
+- Windows: `netstat -ano | findstr :8000`
+- Linux/Mac: `lsof -i :8000`
+- Kill process or use different port
 
 ### Frontend Issues
 
-**CORS errors**
-- Verify `NEXT_PUBLIC_API_URL` points to correct backend
-- Check backend CORS middleware allows your frontend origin
+**"Cannot connect to backend"**
+- Verify `NEXT_PUBLIC_API_URL` environment variable
+- Check backend is running (`/health` endpoint)
+- Check CORS settings in backend
 
 **Build fails**
-- Clear Next.js cache: `rm -rf .next`
-- Reinstall dependencies: `rm -rf node_modules && npm install`
-- Verify Node.js version: `node --version` (need 18+)
+- Clear cache: `rm -rf .next`
+- Reinstall: `rm -rf node_modules && npm install`
+- Verify Node.js 18+
 
-**Type errors**
-- Ensure frontend interfaces match backend Pydantic models exactly
-- Check imports and paths
-
-**Chat not working**
+**Email verification not working**
+- Check spam/junk folder
+- Use "Resend Email" button
+- Check Render logs for email sending status
 - Ensure backend is running and `/api/chat` endpoint is accessible
-- Check browser console for errors
-- Verify OPENROUTER_API_KEY is set in backend .env
-
-**History/Snippets not persisting**
-- Check browser localStorage is enabled
-- Verify you're not in incognito/private mode
-- Check browser storage quota
-- Clear browser cache if data seems corrupted
-
 ### Deployment Issues
 
-**Render: "Cannot find main.py"**
-- Solution: Set Root Directory to `backend` in Render dashboard
-- Settings → Root Directory → `backend` → Save
+**Render: Build fails**
+- Set **Root Directory** to `backend`
+- Verify all environment variables are set
+- Check logs for missing dependencies
 
 **Vercel: Build fails**
-- Check Root Directory is set to `frontend`
-- Verify all environment variables are set
-- Check build logs for specific errors
+- Set **Root Directory** to `frontend`
+- Verify `NEXT_PUBLIC_API_URL` is set
+- Check build logs for TypeScript errors
 
-## 📚 API Documentation
+**Email not working in production**
+- Verify Brevo API key is active
+- Check FROM_EMAIL is verified in Brevo
+- Ensure FRONTEND_URL matches your actual frontend URL
 
-### Endpoints
+## 🤝 Contributing
 
-**GET /**
-```json
-{
-  "message": "AI Code Review Assistant API",
-  "version": "1.0.0",
-  "status": "healthy"
-}
-```
+Contributions are welcome! Please follow these steps:
 
-**GET /health**
-```json
-{
-  "status": "healthy",
-  "api_configured": true
-}
-```
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-**POST /api/review**
+## 📝 License
 
-Request:
-```json
-{
-  "code": "function example() { return 42; }",
-  "language": "javascript"
-}
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-Response:
-```json
-{
-  "overall_score": 85,
-  "summary": "Clean function with good practices",
-  "strengths": ["Clear function name", "Simple logic"],
-  "bugs": [],
-  "security_issues": [],
-  "performance_tips": [],
-  "refactoring_suggestions": [],
-  "complexity_analysis": {
-    "time_complexity": "O(1)",
-    "space_complexity": "O(1)",
-    "explanation": "Constant time and space",
-    "optimization_potential": "Already optimal"
-  }
-}
-```
+## 👨‍💻 Author
 
-**POST /api/chat**
+**Rohit BS**
+- GitHub: [@BSRohit20](https://github.com/BSRohit20)
+- Email: rohitbs2004@gmail.com
+- LinkedIn: [Rohit BS](https://linkedin.com/in/rohitbs)
 
-Request:
-```json
-{
-  "message": "How can I optimize this function?",
+## 🙏 Acknowledgments
+
+- **Pydantic AI** team for the amazing AI framework
+- **OpenRouter** for providing free access to powerful AI models
+- **Mistral AI** for the Devstral code-optimized model
+- **Brevo** for reliable email delivery service
+- **Vercel** and **Render** for excellent free hosting
+- **MongoDB** for their generous free tier
+
+## 📞 Support
+
+For issues, questions, or suggestions:
+- 🐛 [Open an Issue](https://github.com/BSRohit20/codecritic-ai/issues)
+- 💬 [Discussions](https://github.com/BSRohit20/codecritic-ai/discussions)
+- 📧 Email: rohitbs2004@gmail.com
+
+---
+
+**⭐ If you find this project helpful, please give it a star on GitHub!**
+
+Built with ❤️ using FastAPI, Next.js, and Pydantic AI
   "code": "function example() { return 42; }",
   "language": "javascript",
   "review_context": {},
