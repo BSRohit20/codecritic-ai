@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 import asyncio
 from datetime import datetime, timedelta
 from database import connect_to_mongo, close_mongo_connection, get_users_collection, database
-from auth import get_password_hash, verify_password, create_access_token, get_current_user
+from auth import get_password_hash, verify_password, create_access_token, get_current_user, create_verification_token, verify_verification_token
+from email_service import send_verification_email, send_welcome_email
 import httpx
 from bson.objectid import ObjectId
 
@@ -339,6 +340,9 @@ async def register(user: UserRegister):
         if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
         
+        # Create verification token
+        verification_token = create_verification_token(user.email)
+        
         # Create user
         hashed_password = get_password_hash(user.password)
         user_doc = {
@@ -346,13 +350,18 @@ async def register(user: UserRegister):
             "name": user.name,
             "password": hashed_password,
             "created_at": datetime.utcnow(),
-            "is_active": True
+            "is_active": True,
+            "email_verified": False,
+            "verification_token": verification_token
         }
         
         result = await users_collection.insert_one(user_doc)
         user_id = str(result.inserted_id)
         
-        # Create access token
+        # Send verification email
+        email_result = await send_verification_email(user.email, verification_token)
+        
+        # Create access token (user can use app but some features may be limited)
         access_token = create_access_token(
             data={"sub": user.email, "user_id": user_id}
         )
@@ -363,8 +372,10 @@ async def register(user: UserRegister):
             "user": {
                 "id": user_id,
                 "email": user.email,
-                "name": user.name
-            }
+                "name": user.name,
+                "email_verified": False
+            },
+            "message": "Registration successful! Please check your email to verify your account."
         }
     except HTTPException:
         raise
@@ -425,12 +436,92 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         return {
             "id": str(db_user["_id"]),
             "email": db_user["email"],
-            "name": db_user["name"]
+            "name": db_user["name"],
+            "email_verified": db_user.get("email_verified", False)
         }
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get user: {str(e)}")
+
+@app.get("/api/auth/verify-email")
+async def verify_email(token: str):
+    """Verify user email with token"""
+    try:
+        users_collection = get_users_collection()
+        
+        # Verify the token
+        email = verify_verification_token(token)
+        if not email:
+            raise HTTPException(status_code=400, detail="Invalid or expired verification token")
+        
+        # Find user and update verification status
+        user = await users_collection.find_one({"email": email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        if user.get("email_verified"):
+            return {"message": "Email already verified", "already_verified": True}
+        
+        # Update user verification status
+        await users_collection.update_one(
+            {"email": email},
+            {
+                "$set": {
+                    "email_verified": True,
+                    "verified_at": datetime.utcnow()
+                },
+                "$unset": {"verification_token": ""}
+            }
+        )
+        
+        # Send welcome email
+        await send_welcome_email(email, user.get("name", ""))
+        
+        return {
+            "message": "Email verified successfully!",
+            "email": email,
+            "verified": True
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Verification failed: {str(e)}")
+
+@app.post("/api/auth/resend-verification")
+async def resend_verification(current_user: dict = Depends(get_current_user)):
+    """Resend verification email"""
+    try:
+        users_collection = get_users_collection()
+        
+        # Get user
+        user = await users_collection.find_one({"email": current_user["email"]})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        if user.get("email_verified"):
+            raise HTTPException(status_code=400, detail="Email already verified")
+        
+        # Create new verification token
+        verification_token = create_verification_token(current_user["email"])
+        
+        # Update token in database
+        await users_collection.update_one(
+            {"email": current_user["email"]},
+            {"$set": {"verification_token": verification_token}}
+        )
+        
+        # Send verification email
+        email_result = await send_verification_email(current_user["email"], verification_token)
+        
+        return {
+            "message": "Verification email sent! Please check your inbox.",
+            "success": True
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to resend verification: {str(e)}")
 
 # ==================== REVIEW HISTORY ENDPOINTS ====================
 

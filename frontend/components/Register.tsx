@@ -17,11 +17,13 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     // Validation
     if (password !== confirmPassword) {
@@ -39,6 +41,7 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
     try {
       const captchaToken = recaptchaRef.current?.getValue() || 'dummy-captcha-token';
       await register(email, password, name, captchaToken);
+      setSuccess('Registration successful! Please check your email to verify your account.');
     } catch (err: any) {
       setError(err.message || 'Registration failed');
       recaptchaRef.current?.reset();
@@ -224,6 +227,19 @@ export default function Register({ onSwitchToLogin }: RegisterProps) {
             {error && (
               <div className="bg-red-900/30 border border-red-500/50 rounded-lg p-3 text-red-300 text-sm">
                 {error}
+              </div>
+            )}
+
+            {/* Success Message */}
+            {success && (
+              <div className="bg-green-900/30 border border-green-500/50 rounded-lg p-3 text-green-300 text-sm">
+                <div className="flex items-start gap-2">
+                  <Mail className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-semibold mb-1">{success}</p>
+                    <p className="text-xs text-green-400">Check your spam folder if you don't see it in your inbox.</p>
+                  </div>
+                </div>
               </div>
             )}
 

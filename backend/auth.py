@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import os
+import secrets
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -73,3 +74,28 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         return {"email": email, "user_id": payload.get("user_id")}
     except JWTError:
         raise credentials_exception
+
+def generate_verification_token() -> str:
+    """Generate a secure random verification token"""
+    return secrets.token_urlsafe(32)
+
+def create_verification_token(email: str, expires_hours: int = 24) -> str:
+    """Create a JWT token for email verification"""
+    expire = datetime.utcnow() + timedelta(hours=expires_hours)
+    to_encode = {
+        "sub": email,
+        "exp": expire,
+        "type": "email_verification"
+    }
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def verify_verification_token(token: str) -> Optional[str]:
+    """Verify email verification token and return email if valid"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "email_verification":
+            return None
+        email: str = payload.get("sub")
+        return email
+    except JWTError:
+        return None
