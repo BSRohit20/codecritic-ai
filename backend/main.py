@@ -140,7 +140,12 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "api_configured": bool(os.getenv("OPENROUTER_API_KEY"))}
+    return {
+        "status": "healthy",
+        "api_configured": bool(os.getenv("OPENROUTER_API_KEY")),
+        "email_configured": bool(os.getenv("RESEND_API_KEY")),
+        "mongodb_configured": bool(os.getenv("MONGODB_URL"))
+    }
 
 @app.post("/api/review", response_model=CodeReviewResult)
 async def review_code(request: CodeReviewRequest):
