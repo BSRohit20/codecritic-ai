@@ -1,30 +1,24 @@
 import os
-import aiosmtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import resend
 from dotenv import load_dotenv
 
 load_dotenv()
 
+resend.api_key = os.getenv("RESEND_API_KEY", "")
+
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
-SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USERNAME)
+FROM_EMAIL = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
 
 async def send_verification_email(email: str, token: str):
     """Send email verification link to user"""
     try:
         verification_link = f"{FRONTEND_URL}/verify-email?token={token}"
         
-        # Create message
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = "Verify Your Email - CodeCritic AI"
-        msg['From'] = FROM_EMAIL
-        msg['To'] = email
-        
-        html_content = f"""
+        params = {
+            "from": FROM_EMAIL,
+            "to": [email],
+            "subject": "Verify Your Email - CodeCritic AI",
+            "html": f"""
             <!DOCTYPE html>
             <html>
             <head>
@@ -58,30 +52,29 @@ async def send_verification_email(email: str, token: str):
                 </div>
             </body>
             </html>
-        """
+            """
+        }
         
-        msg.attach(MIMEText(html_content, 'html'))
-        
-        # Only send email if SMTP credentials are configured
-        if SMTP_USERNAME and SMTP_PASSWORD:
-            print(f"📧 Sending verification email to {email} via SMTP...")
-            await aiosmtplib.send(
-                msg,
-                hostname=SMTP_HOST,
-                port=SMTP_PORT,
-                username=SMTP_USERNAME,
-                password=SMTP_PASSWORD,
-                start_tls=True
-            )
-            print(f"✅ Email sent successfully to {email}")
-            return {"success": True, "recipient": email}
+        # Only send email if API key is configured
+        if resend.api_key and resend.api_key != "":
+            print(f"📧 Sending verification email to {email} with Resend API...")
+            email_result = resend.Emails.send(params)
+            print(f"✅ Email sent successfully! ID: {email_result.get('id')}")
+            return {"success": True, "id": email_result.get("id")}
         else:
-            # In development without credentials, just log the link
-            print(f"📧 Email verification link (SMTP not configured): {verification_link}")
+            # In development without API key, just log the link
+            print(f"📧 Email verification link (API key not configured): {verification_link}")
             return {"success": True, "dev_mode": True, "link": verification_link}
             
     except Exception as e:
-        print(f"❌ Error sending verification email to {email}: {str(e)}")
+        error_msg = str(e)
+        print(f"❌ Error sending verification email to {email}: {error_msg}")
+        
+        # Check if it's a Resend domain verification error
+        if "verify a domain" in error_msg.lower() or "testing emails" in error_msg.lower():
+            print(f"⚠️  Resend requires domain verification to send to this email.")
+            print(f"   For testing, use your verified email, or add a domain at resend.com/domains")
+        
         print(f"Error details: {type(e).__name__}")
         import traceback
         traceback.print_exc()
@@ -90,13 +83,11 @@ async def send_verification_email(email: str, token: str):
 async def send_welcome_email(email: str, name: str):
     """Send welcome email after verification"""
     try:
-        # Create message
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = "Welcome to CodeCritic AI! 🎉"
-        msg['From'] = FROM_EMAIL
-        msg['To'] = email
-        
-        html_content = f"""
+        params = {
+            "from": FROM_EMAIL,
+            "to": [email],
+            "subject": "Welcome to CodeCritic AI! 🎉",
+            "html": f"""
             <!DOCTYPE html>
             <html>
             <head>
@@ -142,20 +133,11 @@ async def send_welcome_email(email: str, name: str):
                 </div>
             </body>
             </html>
-        """
+            """
+        }
         
-        msg.attach(MIMEText(html_content, 'html'))
-        
-        if SMTP_USERNAME and SMTP_PASSWORD:
-            await aiosmtplib.send(
-                msg,
-                hostname=SMTP_HOST,
-                port=SMTP_PORT,
-                username=SMTP_USERNAME,
-                password=SMTP_PASSWORD,
-                start_tls=True
-            )
-            print(f"✅ Welcome email sent to {email}")
+        if resend.api_key and resend.api_key != "":
+            resend.Emails.send(params)
         else:
             print(f"📧 Welcome email (dev mode) sent to {email}")
             
