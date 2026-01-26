@@ -56,15 +56,21 @@ async def send_verification_email(email: str, token: str):
         }
         
         # Only send email if API key is configured
-        if resend.api_key and resend.api_key != "":
-            print(f"📧 Sending verification email to {email} with Resend API...")
-            email_result = resend.Emails.send(params)
-            print(f"✅ Email sent successfully! ID: {email_result.get('id')}")
-            return {"success": True, "id": email_result.get("id")}
-        else:
-            # In development without API key, just log the link
+        if not resend.api_key or resend.api_key == "":
+            print(f"⚠️  RESEND_API_KEY not configured! Email will not be sent.")
             print(f"📧 Email verification link (API key not configured): {verification_link}")
-            return {"success": True, "dev_mode": True, "link": verification_link}
+            return {"success": False, "error": "RESEND_API_KEY not configured", "dev_mode": True, "link": verification_link}
+        
+        if not FROM_EMAIL or FROM_EMAIL == "onboarding@resend.dev":
+            print(f"⚠️  FROM_EMAIL not configured! Using default {FROM_EMAIL}")
+        
+        print(f"📧 Sending verification email to {email} with Resend API...")
+        print(f"   From: {FROM_EMAIL}")
+        print(f"   Frontend URL: {FRONTEND_URL}")
+        
+        email_result = resend.Emails.send(params)
+        print(f"✅ Email sent successfully! ID: {email_result.get('id')}")
+        return {"success": True, "id": email_result.get("id")}
             
     except Exception as e:
         error_msg = str(e)
@@ -136,10 +142,17 @@ async def send_welcome_email(email: str, name: str):
             """
         }
         
-        if resend.api_key and resend.api_key != "":
-            resend.Emails.send(params)
-        else:
-            print(f"📧 Welcome email (dev mode) sent to {email}")
+        if not resend.api_key or resend.api_key == "":
+            print(f"⚠️  RESEND_API_KEY not configured! Welcome email will not be sent.")
+            return {"success": False, "error": "RESEND_API_KEY not configured"}
+        
+        print(f"📧 Sending welcome email to {email}...")
+        email_result = resend.Emails.send(params)
+        print(f"✅ Welcome email sent successfully! ID: {email_result.get('id')}")
+        return {"success": True, "id": email_result.get("id")}
             
     except Exception as e:
-        print(f"Error sending welcome email: {str(e)}")
+        print(f"❌ Error sending welcome email to {email}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return {"success": False, "error": str(e)}

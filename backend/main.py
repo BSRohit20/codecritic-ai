@@ -10,7 +10,7 @@ import asyncio
 from datetime import datetime, timedelta
 from database import connect_to_mongo, close_mongo_connection, get_users_collection, database
 from auth import get_password_hash, verify_password, create_access_token, get_current_user, create_verification_token, verify_verification_token
-from email_service import send_verification_email, send_welcome_email
+from email_service_brevo import send_verification_email, send_welcome_email
 import httpx
 from bson.objectid import ObjectId
 
@@ -143,8 +143,11 @@ async def health_check():
     return {
         "status": "healthy",
         "api_configured": bool(os.getenv("OPENROUTER_API_KEY")),
-        "email_configured": bool(os.getenv("RESEND_API_KEY")),
-        "mongodb_configured": bool(os.getenv("MONGODB_URL"))
+        "email_configured": bool(os.getenv("BREVO_API_KEY")),
+        "from_email_configured": bool(os.getenv("FROM_EMAIL")),
+        "frontend_url_configured": bool(os.getenv("FRONTEND_URL")),
+        "mongodb_configured": bool(os.getenv("MONGODB_URL")),
+        "jwt_configured": bool(os.getenv("JWT_SECRET_KEY"))
     }
 
 @app.post("/api/review", response_model=CodeReviewResult)
@@ -369,12 +372,25 @@ async def register(user: UserRegister):
         # Log email result for debugging
         print(f"📧 Verification email result for {user.email}: {email_result}")
         
+        # Warn if email failed but don't block registration
+        email_warning = None
+        verification_link = None
+        
+        if not email_result.get("success"):
+            email_warning = "Registration successful but verification email could not be sent. Please check server logs."
+            print(f"⚠️  Email service failure for {user.email}: {email_result.get('error', 'Unknown error')}")
+        
+        # In development or if email failed, include verification link
+        if email_result.get("dev_mode") or email_result.get("link"):
+            verification_link = f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/verify-email?token={verification_token}"
+            print(f"🔗 Verification link for {user.email}: {verification_link}")
+        
         # Create access token (user can use app but some features may be limited)
         access_token = create_access_token(
             data={"sub": user.email, "user_id": user_id}
         )
         
-        return {
+        response_data = {
             "access_token": access_token,
             "token_type": "bearer",
             "user": {
@@ -385,6 +401,15 @@ async def register(user: UserRegister):
             },
             "message": "Registration successful! Please check your email to verify your account."
         }
+        
+        if email_warning:
+            response_data["email_warning"] = email_warning
+        
+        # Include verification link in response for debugging (remove in production)
+        if verification_link and os.getenv("ENVIRONMENT") != "production":
+            response_data["verification_link"] = verification_link
+            
+        return response_data
     except HTTPException:
         raise
     except Exception as e:
@@ -521,6 +546,16 @@ async def resend_verification(current_user: dict = Depends(get_current_user)):
         
         # Send verification email
         email_result = await send_verification_email(current_user["email"], verification_token)
+        
+        # Log the result
+        print(f"📧 Resend verification email result for {current_user['email']}: {email_result}")
+        
+        if not email_result.get("success"):
+            print(f"⚠️  Email service failure: {email_result.get('error', 'Unknown error')}")
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Failed to send verification email: {email_result.get('error', 'Email service unavailable')}"
+            )
         
         return {
             "message": "Verification email sent! Please check your inbox.",

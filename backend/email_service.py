@@ -18,6 +18,13 @@ async def send_verification_email(email: str, token: str):
     try:
         verification_link = f"{FRONTEND_URL}/verify-email?token={token}"
         
+        print(f"📧 Email Configuration:")
+        print(f"   SMTP Host: {SMTP_HOST}:{SMTP_PORT}")
+        print(f"   From: {FROM_EMAIL}")
+        print(f"   To: {email}")
+        print(f"   Frontend URL: {FRONTEND_URL}")
+        print(f"   Credentials configured: {bool(SMTP_USERNAME and SMTP_PASSWORD)}")
+        
         # Create message
         msg = MIMEMultipart('alternative')
         msg['Subject'] = "Verify Your Email - CodeCritic AI"
@@ -64,21 +71,40 @@ async def send_verification_email(email: str, token: str):
         
         # Only send email if SMTP credentials are configured
         if SMTP_USERNAME and SMTP_PASSWORD:
-            print(f"📧 Sending verification email to {email} via SMTP...")
-            await aiosmtplib.send(
-                msg,
-                hostname=SMTP_HOST,
-                port=SMTP_PORT,
-                username=SMTP_USERNAME,
-                password=SMTP_PASSWORD,
-                start_tls=True
-            )
-            print(f"✅ Email sent successfully to {email}")
-            return {"success": True, "recipient": email}
+            print(f"📧 Attempting to send verification email to {email} via SMTP...")
+            try:
+                # Use SSL (port 465) or STARTTLS (port 587) based on port
+                use_tls = SMTP_PORT == 465
+                
+                await aiosmtplib.send(
+                    msg,
+                    hostname=SMTP_HOST,
+                    port=SMTP_PORT,
+                    username=SMTP_USERNAME,
+                    password=SMTP_PASSWORD,
+                    use_tls=use_tls,  # Use SSL for port 465
+                    start_tls=(not use_tls),  # Use STARTTLS for port 587
+                    timeout=30  # 30 second timeout
+                )
+                print(f"✅ Email sent successfully to {email}")
+                return {"success": True, "recipient": email}
+            except aiosmtplib.SMTPAuthenticationError as e:
+                print(f"❌ SMTP Authentication failed! Check your Gmail app password.")
+                print(f"   Error: {str(e)}")
+                return {"success": False, "error": f"Authentication failed: {str(e)}"}
+            except aiosmtplib.SMTPException as e:
+                print(f"❌ SMTP error: {str(e)}")
+                return {"success": False, "error": f"SMTP error: {str(e)}"}
+            except Exception as e:
+                print(f"❌ Unexpected error sending email: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                return {"success": False, "error": str(e)}
         else:
             # In development without credentials, just log the link
-            print(f"📧 Email verification link (SMTP not configured): {verification_link}")
-            return {"success": True, "dev_mode": True, "link": verification_link}
+            print(f"⚠️  SMTP credentials not configured!")
+            print(f"📧 Email verification link: {verification_link}")
+            return {"success": False, "error": "SMTP not configured", "dev_mode": True, "link": verification_link}
             
     except Exception as e:
         print(f"❌ Error sending verification email to {email}: {str(e)}")
@@ -147,17 +173,33 @@ async def send_welcome_email(email: str, name: str):
         msg.attach(MIMEText(html_content, 'html'))
         
         if SMTP_USERNAME and SMTP_PASSWORD:
-            await aiosmtplib.send(
-                msg,
-                hostname=SMTP_HOST,
-                port=SMTP_PORT,
-                username=SMTP_USERNAME,
-                password=SMTP_PASSWORD,
-                start_tls=True
-            )
-            print(f"✅ Welcome email sent to {email}")
+            print(f"📧 Sending welcome email to {email}...")
+            try:
+                use_tls = SMTP_PORT == 465
+                
+                await aiosmtplib.send(
+                    msg,
+                    hostname=SMTP_HOST,
+                    port=SMTP_PORT,
+                    username=SMTP_USERNAME,
+                    password=SMTP_PASSWORD,
+                    use_tls=use_tls,
+                    start_tls=(not use_tls),
+                    timeout=30
+                )
+                print(f"✅ Welcome email sent successfully to {email}")
+                return {"success": True, "recipient": email}
+            except Exception as smtp_error:
+                print(f"❌ Error sending welcome email via SMTP: {str(smtp_error)}")
+                import traceback
+                traceback.print_exc()
+                return {"success": False, "error": str(smtp_error)}
         else:
-            print(f"📧 Welcome email (dev mode) sent to {email}")
+            print(f"⚠️  SMTP not configured - Welcome email not sent to {email}")
+            return {"success": False, "error": "SMTP not configured"}
             
     except Exception as e:
-        print(f"Error sending welcome email: {str(e)}")
+        print(f"❌ Error in send_welcome_email: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return {"success": False, "error": str(e)}
