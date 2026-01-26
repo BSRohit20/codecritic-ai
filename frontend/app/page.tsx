@@ -69,6 +69,32 @@ export default function Home() {
   const [result, setResult] = useState<CodeReviewResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [emailResent, setEmailResent] = useState(false);
+
+  const handleResendVerification = async () => {
+    setResendingEmail(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`${apiUrl}/api/auth/resend-verification`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        setEmailResent(true);
+        setTimeout(() => setEmailResent(false), 5000);
+      }
+    } catch (err) {
+      console.error('Failed to resend email:', err);
+    } finally {
+      setResendingEmail(false);
+    }
+  };
 
   // Show loading while checking auth
   if (authLoading) {
@@ -165,6 +191,29 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Email Verification Banner */}
+      {user && !user.email_verified && (
+        <div className="bg-yellow-500/10 border-b border-yellow-500/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-yellow-500" />
+                <span className="text-yellow-200">
+                  Please verify your email to access all features. Check your inbox for the verification link.
+                </span>
+              </div>
+              <button
+                onClick={handleResendVerification}
+                disabled={resendingEmail || emailResent}
+                className="px-4 py-1.5 bg-yellow-500 hover:bg-yellow-600 text-slate-900 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              >
+                {emailResent ? '✓ Email Sent' : resendingEmail ? 'Sending...' : 'Resend Email'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
       {/* Header */}
       <header className="border-b border-slate-700 bg-slate-900/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
