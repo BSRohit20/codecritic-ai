@@ -435,6 +435,26 @@ async def login(user: UserLogin):
         if not verify_password(user.password, db_user["password"]):
             raise HTTPException(status_code=401, detail="Invalid email or password")
         
+        # Check email verification
+        if not db_user.get("email_verified", False):
+            # Still allow login but indicate email is not verified
+            user_id = str(db_user["_id"])
+            access_token = create_access_token(
+                data={"sub": user.email, "user_id": user_id}
+            )
+            
+            return {
+                "access_token": access_token,
+                "token_type": "bearer",
+                "user": {
+                    "id": user_id,
+                    "email": db_user["email"],
+                    "name": db_user["name"],
+                    "email_verified": False
+                },
+                "warning": "Please verify your email to access all features"
+            }
+        
         # Create access token
         user_id = str(db_user["_id"])
         access_token = create_access_token(
@@ -447,7 +467,8 @@ async def login(user: UserLogin):
             "user": {
                 "id": user_id,
                 "email": db_user["email"],
-                "name": db_user["name"]
+                "name": db_user["name"],
+                "email_verified": db_user.get("email_verified", False)
             }
         }
     except HTTPException:
